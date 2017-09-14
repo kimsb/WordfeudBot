@@ -69,7 +69,7 @@ public class Bot {
                     }
                 } else {
                     TileMove bestMove = bestMoves.get(bestMoves.size() - 1);
-                    botClient.place(game.getId(), game.getRuleset(), bestMove.getTiles(), bestMove.getWord().toCharArray());
+                    botClient.makeMove(game, bestMove);
 
                     bagCount.put(id, Byte.toUnsignedInt(game.getBagCount()) - bestMove.getTiles().length);
                 }
