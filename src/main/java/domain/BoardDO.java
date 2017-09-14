@@ -1,6 +1,6 @@
 package domain;
 
-import nu.mrpi.wordfeudapi.domain.Tile;
+import wordfeudapi.domain.Tile;
 
 public class BoardDO {
 

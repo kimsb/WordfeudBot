@@ -1,9 +1,9 @@
 package domain;
 
 import constants.ScoreConstants;
-import nu.mrpi.wordfeudapi.domain.Board;
-import nu.mrpi.wordfeudapi.domain.Tile;
-import nu.mrpi.wordfeudapi.domain.TileMove;
+import wordfeudapi.domain.Board;
+import wordfeudapi.domain.Tile;
+import wordfeudapi.domain.TileMove;
 
 import java.util.ArrayList;
 

@@ -1,8 +1,8 @@
 import com.BoxOfC.MDAG.MDAG;
 import domain.BoardDO;
 import domain.MoveDO;
-import nu.mrpi.wordfeudapi.RestWordFeudClient;
-import nu.mrpi.wordfeudapi.domain.*;
+import wordfeudapi.RestWordFeudClient;
+import wordfeudapi.domain.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;

@@ -1,7 +1,7 @@
-import nu.mrpi.wordfeudapi.RestWordFeudClient;
-import nu.mrpi.wordfeudapi.domain.Game;
-import nu.mrpi.wordfeudapi.domain.User;
 import org.junit.Test;
+import wordfeudapi.RestWordFeudClient;
+import wordfeudapi.domain.Game;
+import wordfeudapi.domain.User;
 
 public class apiTest {
 
