@@ -61,13 +61,18 @@ public class Bot {
                 bingoMessages.remove(id);
 
                 List<TileMove> bestMoves = findBestMoves(game);
-                TileMove bestMove = bestMoves.get(bestMoves.size() - 1);
-                botClient.place(game.getId(), game.getRuleset(), bestMove.getTiles(), bestMove.getWord().toCharArray());
+                if (bestMoves.isEmpty()) {
+                    if (game.getBagCount() >= 7) {
+                        botClient.swap(id, game.getMyRack().chars());
+                    } else {
+                        botClient.pass(id);
+                    }
+                } else {
+                    TileMove bestMove = bestMoves.get(bestMoves.size() - 1);
+                    botClient.place(game.getId(), game.getRuleset(), bestMove.getTiles(), bestMove.getWord().toCharArray());
 
-                bagCount.put(id, Byte.toUnsignedInt(game.getBagCount()) - bestMove.getTiles().length);
-
-                //TODO - sjekk om jeg trenger egen moomin-klient!
-                //game.getOpponent().getRack();
+                    bagCount.put(id, Byte.toUnsignedInt(game.getBagCount()) - bestMove.getTiles().length);
+                }
 
                 //bingotips for moomin85
                 if ("moomin85".equals(game.getOpponentName())) {
