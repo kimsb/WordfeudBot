@@ -1,4 +1,4 @@
-import com.BoxOfC.MDAG.MDAG;
+import mdag.MDAG;
 
 import java.io.File;
 import java.io.IOException;

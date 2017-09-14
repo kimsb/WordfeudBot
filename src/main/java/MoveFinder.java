@@ -1,7 +1,7 @@
-import com.BoxOfC.MDAG.MDAG;
-import com.BoxOfC.MDAG.MDAGNode;
 import domain.BoardDO;
 import domain.MoveDO;
+import mdag.MDAG;
+import mdag.MDAGNode;
 import wordfeudapi.domain.Board;
 
 import java.util.ArrayList;

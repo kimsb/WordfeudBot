@@ -1,6 +1,6 @@
-import com.BoxOfC.MDAG.MDAG;
 import domain.BoardDO;
 import domain.MoveDO;
+import mdag.MDAG;
 import wordfeudapi.RestWordFeudClient;
 import wordfeudapi.domain.*;
 
