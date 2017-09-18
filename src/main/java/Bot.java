@@ -14,8 +14,8 @@ import java.util.stream.Stream;
 public class Bot {
 
     MDAG dictionary;
-    RestWordFeudClient botClient, kimClient;
-    User kim, moominBot;
+    RestWordFeudClient botClient, kimClient, tomClient;
+    User kim, moominBot, tom;
     HashMap<Long, String> bingoMessages = new HashMap<>();
     HashMap<Long, Integer> bagCount = new HashMap<>();
 
@@ -25,6 +25,7 @@ public class Bot {
         botClient = new RestWordFeudClient();
         kimClient = new RestWordFeudClient();
         kim = kimClient.logon(System.getenv("KIMUSER"), System.getenv("KIMPASSWORD"));
+        tom = tomClient.logon(System.getenv("TOMUSER"), System.getenv("TOMPASSWORD"));
         moominBot = botClient.logon(System.getenv("BOTUSER"), System.getenv("BOTPASSWORD"));
         botLoop();
     }
@@ -55,6 +56,7 @@ public class Bot {
                 if (bagCount.containsKey(id) && bagCount.get(id) != currentBagCount + 7) {
                     if (bingoMessages.containsKey(id)) {
                         botClient.chat(id, bingoMessages.get(id));
+                        System.out.println("Bingotips til " + game.getOpponentName() + bingoMessages.get(id));
                     }
                 }
                 bingoMessages.remove(id);
@@ -69,12 +71,20 @@ public class Bot {
                 } else {
                     TileMove bestMove = bestMoves.get(bestMoves.size() - 1);
                     botClient.makeMove(game, bestMove);
+                    System.out.println("Mot " + game.getOpponentName() + ": legger \"" + bestMove.getWord() + "\" "
+                            + "for " + bestMove.getPoints() + "poeng");
 
                     bagCount.put(id, Byte.toUnsignedInt(game.getBagCount()) - bestMove.getTiles().length);
                 }
 
-                //bingotips for moomin85
+                //bingotips for moomin85/tobov!
                 if ("moomin85".equals(game.getOpponentName())) {
+                    List<TileMove> bingos = findBestMoves(kimClient.getGame(id)).stream()
+                            .filter(tileMove -> tileMove.getTiles().length == 7)
+                            .collect(Collectors.toList());
+                    createChatMessage(game.getId(), bingos);
+                }
+                if ("tobov!".equals(game.getOpponentName())) {
                     List<TileMove> bingos = findBestMoves(kimClient.getGame(id)).stream()
                             .filter(tileMove -> tileMove.getTiles().length == 7)
                             .collect(Collectors.toList());
