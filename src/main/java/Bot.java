@@ -24,6 +24,7 @@ public class Bot {
         this.dictionary = dictionary;
         botClient = new RestWordFeudClient();
         kimClient = new RestWordFeudClient();
+        tomClient = new RestWordFeudClient();
         kim = kimClient.logon(System.getenv("KIMUSER"), System.getenv("KIMPASSWORD"));
         tom = tomClient.logon(System.getenv("TOMUSER"), System.getenv("TOMPASSWORD"));
         moominBot = botClient.logon(System.getenv("BOTUSER"), System.getenv("BOTPASSWORD"));
