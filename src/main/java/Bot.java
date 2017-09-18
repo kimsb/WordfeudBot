@@ -21,12 +21,11 @@ public class Bot {
 
 
     Bot(MDAG dictionary) {
-        ConfigProperties configProperties = new ConfigProperties();
         this.dictionary = dictionary;
         botClient = new RestWordFeudClient();
         kimClient = new RestWordFeudClient();
-        kim = kimClient.logon(configProperties.getProperty("kimuser"), configProperties.getProperty("kimpassword"));
-        moominBot = botClient.logon(configProperties.getProperty("botuser"), configProperties.getProperty("botpassword"));
+        kim = kimClient.logon(System.getenv("KIMUSER"), System.getenv("KIMPASSWORD"));
+        moominBot = botClient.logon(System.getenv("BOTUSER"), System.getenv("BOTPASSWORD"));
         botLoop();
     }
 
