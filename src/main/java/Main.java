@@ -11,8 +11,7 @@ public class Main {
 
     private MDAG createDictionary() {
         try {
-            ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource("nsf2016.txt").getFile());
+            File file = new File(ClassLoader.getSystemResource("nsf2016.txt").getFile());
             return new MDAG(file);
         } catch (IOException e) {
             e.printStackTrace();
