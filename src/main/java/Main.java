@@ -1,7 +1,10 @@
 import mdag.MDAG;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
@@ -10,12 +13,11 @@ public class Main {
     }
 
     private MDAG createDictionary() {
-        try {
-            File file = new File(ClassLoader.getSystemResource("nsf2016.txt").getFile());
-            return new MDAG(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream("nsf2016.txt");
+        List<String> dictionary = new BufferedReader(new InputStreamReader(inputStream))
+                .lines().collect(Collectors.toList());
+        return new MDAG(dictionary);
     }
 }
