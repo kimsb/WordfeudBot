@@ -86,7 +86,7 @@ public class Bot {
                     createChatMessage(game.getId(), bingos);
                 }
                 if ("tobov!".equals(game.getOpponentName())) {
-                    List<TileMove> bingos = findBestMoves(kimClient.getGame(id)).stream()
+                    List<TileMove> bingos = findBestMoves(tomClient.getGame(id)).stream()
                             .filter(tileMove -> tileMove.getTiles().length == 7)
                             .collect(Collectors.toList());
                     createChatMessage(game.getId(), bingos);
