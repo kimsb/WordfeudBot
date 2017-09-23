@@ -11,13 +11,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Bot {
+class Bot {
 
-    MDAG dictionary;
-    RestWordFeudClient botClient, kimClient, tomClient;
-    User kim, moominBot, tom;
-    HashMap<Long, String> bingoMessages = new HashMap<>();
-    HashMap<Long, Integer> bagCount = new HashMap<>();
+    private MDAG dictionary;
+    private RestWordFeudClient botClient, kimClient, tomClient;
+    private HashMap<Long, String> bingoMessages = new HashMap<>();
+    private HashMap<Long, Integer> bagCount = new HashMap<>();
 
 
     Bot(MDAG dictionary) {
@@ -25,93 +24,128 @@ public class Bot {
         botClient = new RestWordFeudClient();
         kimClient = new RestWordFeudClient();
         tomClient = new RestWordFeudClient();
-        kim = kimClient.logon(System.getenv("KIMUSER"), System.getenv("KIMPASSWORD"));
-        tom = tomClient.logon(System.getenv("TOMUSER"), System.getenv("TOMPASSWORD"));
-        moominBot = botClient.logon(System.getenv("BOTUSER"), System.getenv("BOTPASSWORD"));
+        kimClient.logon(System.getenv("KIMUSER"), System.getenv("KIMPASSWORD"));
+        tomClient.logon(System.getenv("TOMUSER"), System.getenv("TOMPASSWORD"));
+        botClient.logon(System.getenv("BOTUSER"), System.getenv("BOTPASSWORD"));
         botLoop();
     }
 
-    void botLoop() {
+    private void botLoop() {
         while (true) {
-            //accept invites
-            Stream.of(botClient.getStatus().getInvitesReceived())
-                    .map(Invite::getId)
-                    .forEach(id -> botClient.acceptInvite(id));
+            acceptInvites();
+            createBingoTips(getTheirTurnGameIds());
+            final List<Long> myTurnGameIds = getMyTurnGameIds();
 
-            List<Long> gameIds = Stream.of(botClient.getGames())
-                    .filter(game -> game.isRunning() && game.isMyTurn())
-                    .map(Game::getId)
-                    .collect(Collectors.toList());
-            if (gameIds.isEmpty()) {
+            if (myTurnGameIds.isEmpty()) {
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            for (Long id : gameIds) {
+
+            for (Long id : myTurnGameIds) {
                 Game game = botClient.getGame(id);
-
-                //sjekk om bingotips skal gis
-                int currentBagCount = Byte.toUnsignedInt(game.getBagCount());
-                if (bagCount.containsKey(id) && bagCount.get(id) != currentBagCount + 7) {
-                    if (bingoMessages.containsKey(id)) {
-                        botClient.chat(id, bingoMessages.get(id));
-                        System.out.println("Bingotips til " + game.getOpponentName() + bingoMessages.get(id));
-                    }
-                }
-                bingoMessages.remove(id);
-
-                List<TileMove> bestMoves = findBestMoves(game);
-                if (bestMoves.isEmpty()) {
-                    if (game.getBagCount() >= 7) {
-                        botClient.swap(id, game.getMyRack().chars());
-                    } else {
-                        botClient.pass(id);
-                    }
-                    bagCount.put(id, Byte.toUnsignedInt(game.getBagCount()));
-                } else {
-                    TileMove bestMove = bestMoves.get(bestMoves.size() - 1);
-                    botClient.makeMove(game, bestMove);
-                    System.out.println("Mot " + game.getOpponentName() + ": legger \"" + bestMove.getWord() + "\" "
-                            + "for " + bestMove.getPoints() + "poeng");
-
-                    bagCount.put(id, Byte.toUnsignedInt(game.getBagCount()) - bestMove.getTiles().length);
-                }
-
-                //bingotips for moomin85/tobov!
-                if ("moomin85".equals(game.getOpponentName())) {
-                    List<TileMove> bingos = findBestMoves(kimClient.getGame(id)).stream()
-                            .filter(tileMove -> tileMove.getTiles().length == 7)
-                            .collect(Collectors.toList());
-                    createChatMessage(game.getId(), bingos);
-                } else if ("tobov!".equals(game.getOpponentName())) {
-                    List<TileMove> bingos = findBestMoves(tomClient.getGame(id)).stream()
-                            .filter(tileMove -> tileMove.getTiles().length == 7)
-                            .collect(Collectors.toList());
-                    createChatMessage(game.getId(), bingos);
-                }
-
+                giveBingoTips(id, game);
+                makeBestMove(id, game);
             }
         }
-
     }
 
-    private void createChatMessage(Long gameId, List<TileMove> bingos) {
+    private void makeBestMove(Long id, Game game) {
+        final List<TileMove> bestMoves = findBestMoves(game);
+        if (bestMoves.isEmpty()) {
+            if (game.getBagCount() >= 7) {
+                botClient.swap(id, game.getMyRack().chars());
+            } else {
+                botClient.pass(id);
+            }
+        } else {
+            TileMove bestMove = bestMoves.get(bestMoves.size() - 1);
+            botClient.makeMove(game, bestMove);
+            log(game, "legger \"" + bestMove.getWord() + "\" "
+                    + "for " + bestMove.getPoints() + "p");
+
+        }
+    }
+
+    private void giveBingoTips(final Long gameId, final Game game) {
+        final int currentBagCount = Byte.toUnsignedInt(game.getBagCount());
+        if (bagCount.containsKey(gameId) && bagCount.get(gameId) != currentBagCount + 7) {
+            if (bingoMessages.containsKey(gameId)) {
+                botClient.chat(gameId, bingoMessages.get(gameId));
+                log(game, "sender chatmelding med bingotips");
+            }
+        }
+        bingoMessages.remove(gameId);
+    }
+
+    private void createBingoTips(final List<Long> theirTurnGameIds) {
+        for (Long id : theirTurnGameIds) {
+            final Game game = botClient.getGame(id);
+            if (bingoMessages.containsKey(id)) {
+                break;
+            }
+            if ("moomin85".equals(game.getOpponentName())) {
+                createChatMessage(id, kimClient);
+            } else if ("tobov!".equals(game.getOpponentName())) {
+                createChatMessage(id, tomClient);
+            }
+        }
+    }
+
+    private List<Long> getTheirTurnGameIds() {
+        return Stream.of(botClient.getGames())
+                .filter(game -> game.isRunning() && !game.isMyTurn())
+                .map(Game::getId)
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> getMyTurnGameIds() {
+        return Stream.of(botClient.getGames())
+                .filter(game -> game.isRunning() && game.isMyTurn())
+                .map(Game::getId)
+                .collect(Collectors.toList());
+    }
+
+    private void acceptInvites() {
+        Stream.of(botClient.getStatus().getInvitesReceived())
+                .map(Invite::getId)
+                .forEach(id -> {
+                    final int gameId = botClient.acceptInvite(id);
+                    log(botClient.getGame(gameId), "accepted invite");
+                });
+    }
+
+    private void createChatMessage(final Long gameId, final RestWordFeudClient client) {
+        final Game game = client.getGame(gameId);
+        final List<TileMove> bingos = findBestMoves(game).stream()
+                .filter(tileMove -> tileMove.getTiles().length == 7)
+                .collect(Collectors.toList());
         if (bingos.isEmpty()) {
             return;
         }
-        StringBuilder message = new StringBuilder("Du kunne lagt bingo:");
+        StringBuilder message = new StringBuilder();
         int tipsCount = 0;
         while (!bingos.isEmpty() && tipsCount < 3) {
             TileMove bingo = bingos.remove(bingos.size() - 1);
-            message.append("\n").append(bingo.getWord()).append(" (").append(bingo.getPoints()).append(")");
+            message.append("\n").append(bingo.getPoints()).append(": ").append(bingo.getWord());
+            message.append(" ").append(movePosition(bingo));
             tipsCount++;
         }
-        bingoMessages.put(gameId, message.toString());
+        log(game, "kan legge bingo: " + message.toString().replaceFirst("\n", "")
+                .replace("\n", ", "));
+        bingoMessages.put(gameId, "Du kunne lagt bingo:" + message.toString());
+        bagCount.put(gameId, Byte.toUnsignedInt(game.getBagCount()));
     }
 
-    List<TileMove> findBestMoves(Game game) {
+    private String movePosition(final TileMove tileMove) {
+        final char x = "ABCDEFGHIJKLMNO".charAt(tileMove.getTiles()[0].getX());
+        final String arrow = tileMove.isHorizontalWord() ? "\u21E2" : "\u21E3";
+        return "(" + x + (tileMove.getTiles()[0].getY() + 1) + arrow + ")";
+    }
+
+    private List<TileMove> findBestMoves(Game game) {
         Rack rack = game.getMyRack();
 
         Board board = botClient.getBoard(game);
@@ -123,6 +157,11 @@ public class Bot {
                 .map(MoveDO::toTileMove)
                 .sorted(Comparator.comparingInt(TileMove::getPoints))
                 .collect(Collectors.toList());
+    }
+
+    private void log(final Game game, final String logMessage) {
+        final String opponent = "moominbot".equals(game.getFirstPlayerName()) ? game.getSecondPlayerName() : game.getFirstPlayerName();
+        System.out.println(opponent + " (" + game.getId() + "): " + logMessage);
     }
 
 }

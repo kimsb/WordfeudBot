@@ -18,7 +18,7 @@ public class MoveDO {
     public String word = "";
     public int row;
     public int startColumn;
-    public boolean vertical;
+    public boolean horizontal;
     public int moveScore;
     String usedFromRack;
     String leftOnRack;
@@ -29,7 +29,7 @@ public class MoveDO {
 
     public MoveDO(int r, int startColumn, boolean trans, String fromRack, char[][] charBoard, String leftOnRack, Board board) {
         this.board = board;
-        vertical = trans;
+        horizontal = trans;
         row = r;
         this.startColumn = startColumn;
         usedFromRack = fromRack;
@@ -59,7 +59,7 @@ public class MoveDO {
             char letter = charBoard[i][j+k];
             if (letter == '-') {
                 letter = usedFromRack.charAt(letterFromRack++);
-                addedTiles.add(new Tile(vertical ? j+k : i, vertical ? i : j+k, Character.toUpperCase(letter), Character.isLowerCase(letter)));
+                addedTiles.add(new Tile(horizontal ? j+k : i, horizontal ? i : j+k, Character.toUpperCase(letter), Character.isLowerCase(letter)));
                 int letterScore = ScoreConstants.letterScore(letter) * getLetterMultiplier(i, j+k);
                 horizontalScore += letterScore;
                 int wordMultiplier = getWordMultiplier(i, j+k);
@@ -114,9 +114,9 @@ public class MoveDO {
 
     public String getTipsPlacementString() {
 
-        int boardRow = vertical ? startColumn + 1 : row + 1;
-        int boardColumn = vertical ? row : startColumn;
-        String arrow = vertical ? "&darr;" : "&rarr;";
+        int boardRow = horizontal ? startColumn + 1 : row + 1;
+        int boardColumn = horizontal ? row : startColumn;
+        String arrow = horizontal ? "&darr;" : "&rarr;";
         return " (" + "ABCDEFGHIJKLMNO".charAt(boardColumn) + "  " + boardRow + ") " + arrow;
     }
 
@@ -138,7 +138,7 @@ public class MoveDO {
 
     public TileMove toTileMove() {
         Tile[] tiles = addedTiles.toArray(new Tile[addedTiles.size()]);
-        return new TileMove(tiles, word, moveScore, !vertical);
+        return new TileMove(tiles, word, moveScore, horizontal);
     }
 
 }

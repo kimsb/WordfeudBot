@@ -52,7 +52,7 @@ public class BoardDO {
 
 //    public void addToCharBoard(Move move) {
 //        for (int i = 0; i < move.word.length(); i++) {
-//            if (move.vertical) {
+//            if (move.horizontal) {
 //                if (charBoard[move.startColumn + i][move.row] == '-') {
 //                    charBoard[move.startColumn + i][move.row] = move.word.charAt(i);
 //                }
