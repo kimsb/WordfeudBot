@@ -121,7 +121,7 @@ public class MoveDO {
     }
 
     private int getLetterMultiplier(int x, int y) {
-        switch (board.getBoard()[x][y]) {
+        switch (board.getBoard()[horizontal ? x : y][horizontal ? y : x]) {
             case 1 : return 2;
             case 2 : return 3;
             default: return 1;
@@ -129,7 +129,7 @@ public class MoveDO {
     }
 
     private int getWordMultiplier(int x, int y) {
-        switch (board.getBoard()[x][y]) {
+        switch (board.getBoard()[horizontal ? x : y][horizontal ? y : x]) {
             case 3 : return 2;
             case 4 : return 3;
             default: return 1;
