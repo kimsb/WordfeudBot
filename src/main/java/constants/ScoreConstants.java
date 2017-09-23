@@ -33,7 +33,7 @@ public class ScoreConstants {
         letterScores.put('Æ', 8);
         letterScores.put('Ø', 4);
         letterScores.put('Å', 4);
-        letterScores.put('-', 0);
+        letterScores.put('*', 0);
     }
 
     private static final HashMap<Character, Double> relativeLetterScores;
@@ -65,7 +65,7 @@ public class ScoreConstants {
         relativeLetterScores.put('Æ', - 4.3911);
         relativeLetterScores.put('Ø', - 2.6567);
         relativeLetterScores.put('Å', - 3.0975);
-        relativeLetterScores.put('-', 5.0001);
+        relativeLetterScores.put('*', 5.0001);
     }
 
     public static int letterScore(char letter) {

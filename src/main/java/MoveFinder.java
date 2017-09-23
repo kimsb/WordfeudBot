@@ -106,7 +106,7 @@ public class MoveFinder {
                             rackString += l;
                         }
                     } else { // check for blank
-                        index = rackString.indexOf('-');
+                        index = rackString.indexOf('*');
                         if (index != -1) {
                             //and l is in the crossCheck set of square
                             if (crossChecks[currentAnchorI][squareJ].indexOf(l) != -1) {
@@ -119,7 +119,7 @@ public class MoveFinder {
                                     extendRight(boardDO, charBoard, rackString, crossChecks, (partialWord + Character.toLowerCase(l)), nNext, squareJ+1, usedFromRack + Character.toLowerCase(l));
                                 }
                                 //put the blank tile back in the rack
-                                rackString += '-';
+                                rackString += '*';
                             }
                         }
                     }
@@ -158,7 +158,7 @@ public class MoveFinder {
                     //put the tile back in the rack
                     rackString += l;
                 } else { //if not on rack, check for blanks
-                    index = rackString.indexOf('-');
+                    index = rackString.indexOf('*');
                     if (index != -1) {
                         //then remove blank tile from the rack
                         rackString = rackString.substring(0,index) + rackString.substring(index+1);
@@ -167,7 +167,7 @@ public class MoveFinder {
                         //leftPart(...)
                         leftPart(boardDO, charBoard, rackString, crossChecks, (partialWord + Character.toLowerCase(l)), nNext, limit-1, usedFromRack + Character.toLowerCase(l));
                         //put the blank tile back in the rack
-                        rackString += '-';
+                        rackString += '*';
                     }
                 }
 
@@ -178,7 +178,7 @@ public class MoveFinder {
     //denne kan gjøres raskere, nå sjekker jeg alle felter
     private String[][] findCrossChecks(MDAG dictionary, char[][] charBoard) {
 
-        String alphaString = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ-";
+        String alphaString = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ*";
         String[][] crossChecks = new String[15][15];
 
         for (int i = 0; i < 15; i++) {

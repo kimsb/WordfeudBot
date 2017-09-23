@@ -83,6 +83,7 @@ class Bot {
     private void createBingoTips(final List<Long> theirTurnGameIds) {
         for (Long id : theirTurnGameIds) {
             final Game game = botClient.getGame(id);
+            //TODO: denne breaker bare dersom createChatMessage finner bingoer som kan bli lagt...
             if (bingoMessages.containsKey(id)) {
                 break;
             }
@@ -132,6 +133,9 @@ class Bot {
             message.append("\n").append(bingo.getPoints()).append(": ").append(bingo.getWord());
             message.append(" ").append(movePosition(bingo));
             tipsCount++;
+        }
+        if (!bingos.isEmpty()) {
+            message.append("\n...");
         }
         log(game, "kan legge bingo: " + message.toString().replaceFirst("\n", "")
                 .replace("\n", ", "));
