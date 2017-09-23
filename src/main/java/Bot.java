@@ -44,7 +44,7 @@ public class Bot {
                     .collect(Collectors.toList());
             if (gameIds.isEmpty()) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -69,6 +69,7 @@ public class Bot {
                     } else {
                         botClient.pass(id);
                     }
+                    bagCount.put(id, Byte.toUnsignedInt(game.getBagCount());
                 } else {
                     TileMove bestMove = bestMoves.get(bestMoves.size() - 1);
                     botClient.makeMove(game, bestMove);
@@ -84,8 +85,7 @@ public class Bot {
                             .filter(tileMove -> tileMove.getTiles().length == 7)
                             .collect(Collectors.toList());
                     createChatMessage(game.getId(), bingos);
-                }
-                if ("tobov!".equals(game.getOpponentName())) {
+                } else if ("tobov!".equals(game.getOpponentName())) {
                     List<TileMove> bingos = findBestMoves(tomClient.getGame(id)).stream()
                             .filter(tileMove -> tileMove.getTiles().length == 7)
                             .collect(Collectors.toList());
