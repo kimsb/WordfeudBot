@@ -72,7 +72,7 @@ class Bot {
     private void giveBingoTips(final Long gameId, final Game game) {
         final int currentBagCount = Byte.toUnsignedInt(game.getBagCount());
         if (bagCount.containsKey(gameId) && bagCount.get(gameId) != currentBagCount + 7) {
-            if (bingoMessages.containsKey(gameId)) {
+            if (bingoMessages.containsKey(gameId) && bingoMessages.get(gameId) != null) {
                 botClient.chat(gameId, bingoMessages.get(gameId));
                 log(game, "sender chatmelding med bingotips");
             }
@@ -83,7 +83,6 @@ class Bot {
     private void createBingoTips(final List<Long> theirTurnGameIds) {
         for (Long id : theirTurnGameIds) {
             final Game game = botClient.getGame(id);
-            //TODO: denne breaker bare dersom createChatMessage finner bingoer som kan bli lagt...
             if (bingoMessages.containsKey(id)) {
                 break;
             }
@@ -124,6 +123,7 @@ class Bot {
                 .filter(tileMove -> tileMove.getTiles().length == 7)
                 .collect(Collectors.toList());
         if (bingos.isEmpty()) {
+            bingoMessages.put(gameId, null);
             return;
         }
         StringBuilder message = new StringBuilder();
