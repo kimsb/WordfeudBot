@@ -54,6 +54,11 @@ class Bot {
 
     private void makeBestMove(Long id, Game game) {
         final List<TileMove> bestMoves = findBestMoves(game);
+
+        Board board = botClient.getBoard(game);
+        final TileMove bestRelativeMove = new RelativeMoveScore(dictionary, board).findBestRelativeMove(game, bestMoves);
+
+
         if (bestMoves.isEmpty()) {
             if (game.getBagCount() >= 7) {
                 botClient.swap(id, game.getMyRack().chars());
@@ -61,10 +66,15 @@ class Bot {
                 botClient.pass(id);
             }
         } else {
-            TileMove bestMove = bestMoves.get(bestMoves.size() - 1);
-            botClient.makeMove(game, bestMove);
-            log(game, "legger \"" + bestMove.getWord() + "\" "
-                    + "for " + bestMove.getPoints() + "p");
+            TileMove bestOriginalMove = bestMoves.get(bestMoves.size() - 1);
+            if (!(movePosition(bestOriginalMove).equals(movePosition(bestRelativeMove))
+                    && bestOriginalMove.getWord().equals(bestRelativeMove.getWord()))) {
+                log(game, "legger ikke høyestscorende: \"" + bestOriginalMove.getWord() + "\" "
+                        + "for " + bestOriginalMove.getPoints() + "p " + movePosition(bestOriginalMove));
+            }
+            botClient.makeMove(game, bestRelativeMove);
+            log(game, "legger \"" + bestRelativeMove.getWord() + "\" "
+                    + "for " + bestRelativeMove.getPoints() + "p");
 
         }
     }
@@ -109,6 +119,7 @@ class Bot {
     }
 
     private void acceptInvites() {
+        //TODO: bare accept norsk-bokmål
         Stream.of(botClient.getStatus().getInvitesReceived())
                 .map(Invite::getId)
                 .forEach(id -> {
