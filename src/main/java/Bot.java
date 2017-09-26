@@ -67,15 +67,15 @@ class Bot {
             }
         } else {
             TileMove bestOriginalMove = bestMoves.get(bestMoves.size() - 1);
+            botClient.makeMove(game, bestRelativeMove);
+            String logmessage = "legger \"" + bestRelativeMove.getWord() + "\" "
+                    + "for " + bestRelativeMove.getPoints() + "p " + movePosition(bestRelativeMove);
             if (!(movePosition(bestOriginalMove).equals(movePosition(bestRelativeMove))
                     && bestOriginalMove.getWord().equals(bestRelativeMove.getWord()))) {
-                log(game, "legger ikke høyestscorende: \"" + bestOriginalMove.getWord() + "\" "
-                        + "for " + bestOriginalMove.getPoints() + "p " + movePosition(bestOriginalMove));
+                logmessage += ", ikke \"" + bestOriginalMove.getWord() + "\" "
+                        + "for " + bestOriginalMove.getPoints() + "p " + movePosition(bestOriginalMove);
             }
-            botClient.makeMove(game, bestRelativeMove);
-            log(game, "legger \"" + bestRelativeMove.getWord() + "\" "
-                    + "for " + bestRelativeMove.getPoints() + "p");
-
+            log(game, logmessage);
         }
     }
 
