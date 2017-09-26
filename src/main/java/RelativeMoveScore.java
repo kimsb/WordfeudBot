@@ -36,10 +36,10 @@ public class RelativeMoveScore {
             }
             differential += 0.0000001;
         }
-        //vurderer bare de maks 50 beste
+        //vurderer bare de maks n beste
         ArrayList<TileMove> selectedBestMoves = new ArrayList<>();
         int count = 0;
-        while (!bestMovesTreeMap.isEmpty() && count < 30) {
+        while (!bestMovesTreeMap.isEmpty() && count < 20) {
             selectedBestMoves.add(bestMovesTreeMap.remove(bestMovesTreeMap.firstKey()));
             count++;
         }
@@ -54,8 +54,10 @@ public class RelativeMoveScore {
                         .map(MoveDO::toTileMove)
                         .sorted(Comparator.comparingInt(TileMove::getPoints))
                         .collect(Collectors.toList());
-                TileMove opponentMove = tileMoves.get(tileMoves.size() - 1);
-                sum += opponentMove.getPoints();
+                if (!tileMoves.isEmpty()) {
+                    TileMove opponentMove = tileMoves.get(tileMoves.size() - 1);
+                    sum += opponentMove.getPoints();
+                }
             }
             double averageTopScore = sum / randomOpponentRacks.size();
             relativeMoveScores.put(tileMove.getPoints() - averageTopScore, tileMove);
@@ -68,10 +70,10 @@ public class RelativeMoveScore {
 
         ArrayList<String> opponentRacks = new ArrayList<>();
 
-        for (int i = 0; i < 25; i++) {
+        for (int i = 0; i < 15; i++) {
             Collections.shuffle(remainingLetters);
             StringBuilder letters = new StringBuilder();
-            for (int j = 0; j < 7; j++) {
+            for (int j = 0; j < 7 && j >= remainingLetters.size(); j++) {
                 letters.append(remainingLetters.get(j));
             }
             opponentRacks.add(letters.toString().replace("-", "*"));
