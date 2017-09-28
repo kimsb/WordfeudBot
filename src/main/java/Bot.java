@@ -1,6 +1,5 @@
 import domain.BoardDO;
 import domain.MoveDO;
-import mdag.MDAG;
 import wordfeudapi.RestWordFeudClient;
 import wordfeudapi.domain.*;
 
@@ -13,14 +12,12 @@ import java.util.stream.Stream;
 
 class Bot {
 
-    private MDAG dictionary;
     private RestWordFeudClient botClient, kimClient, tomClient;
     private HashMap<Long, String> bingoMessages = new HashMap<>();
     private HashMap<Long, Integer> bagCount = new HashMap<>();
 
 
-    Bot(MDAG dictionary) {
-        this.dictionary = dictionary;
+    Bot() {
         botClient = new RestWordFeudClient();
         kimClient = new RestWordFeudClient();
         tomClient = new RestWordFeudClient();
@@ -56,7 +53,7 @@ class Bot {
         final List<TileMove> bestMoves = findBestMoves(game);
 
         Board board = botClient.getBoard(game);
-        final TileMove bestRelativeMove = new RelativeMoveScore(dictionary, board).findBestRelativeMove(game, bestMoves);
+        final TileMove bestRelativeMove = new RelativeMoveScore(board).findBestRelativeMove(game, bestMoves);
 
 
         if (bestMoves.isEmpty()) {
@@ -166,7 +163,7 @@ class Bot {
         Board board = botClient.getBoard(game);
         Tile[] tiles = game.getTiles();
 
-        ArrayList<MoveDO> allMoves = new MoveFinder(board).findAllMoves(dictionary, new BoardDO(tiles), new String(rack.chars()));
+        ArrayList<MoveDO> allMoves = new MoveFinder(board).findAllMoves(new BoardDO(tiles), new String(rack.chars()));
 
         return allMoves.stream()
                 .map(MoveDO::toTileMove)

@@ -1,6 +1,5 @@
 import domain.BoardDO;
 import domain.MoveDO;
-import mdag.MDAG;
 import mdag.MDAGNode;
 import wordfeudapi.domain.Board;
 
@@ -17,33 +16,33 @@ public class MoveFinder {
         this.board = board;
     }
 
-    public ArrayList<MoveDO> findAllMoves(MDAG dictionary, BoardDO boardDO, String rack) {
+    public ArrayList<MoveDO> findAllMoves(BoardDO boardDO, String rack) {
 
         allMoves = new ArrayList<>();
 
-        findMoves(dictionary, boardDO, rack);
+        findMoves(boardDO, rack);
 
         return allMoves;
     }
 
-    private void findMoves(MDAG dictionary, BoardDO boardDO, String rackString) {
+    private void findMoves(BoardDO boardDO, String rackString) {
 
         transposed = false;
-        String[][] crossChecks = findCrossChecks(dictionary, boardDO.getCharBoard());
-        findAcrossMoves(boardDO, dictionary, boardDO.getCharBoard(), crossChecks, boardDO.getAnchors(boardDO.getCharBoard()), rackString);
+        String[][] crossChecks = findCrossChecks(boardDO.getCharBoard());
+        findAcrossMoves(boardDO, boardDO.getCharBoard(), crossChecks, boardDO.getAnchors(boardDO.getCharBoard()), rackString);
 
         //down-moves
         transposed = true;
         char[][] transposedCharBoard = boardDO.getTransposedCharBoard();
-        String[][] transposedCrossChecks = findCrossChecks(dictionary, transposedCharBoard);
-        findAcrossMoves(boardDO, dictionary, transposedCharBoard, transposedCrossChecks, boardDO.getAnchors(transposedCharBoard), rackString);
+        String[][] transposedCrossChecks = findCrossChecks(transposedCharBoard);
+        findAcrossMoves(boardDO, transposedCharBoard, transposedCrossChecks, boardDO.getAnchors(transposedCharBoard), rackString);
     }
 
     //TODO: bli kvitt disse globale
     private int currentAnchorI, currentAnchorJ;
     private boolean transposed;
 
-    private void findAcrossMoves(BoardDO boardDO, MDAG dictionary, char[][] charBoard, String[][] crossChecks, boolean[][] isAnchor, String rackString) {
+    private void findAcrossMoves(BoardDO boardDO, char[][] charBoard, String[][] crossChecks, boolean[][] isAnchor, String rackString) {
         //for all anchorSquares
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
@@ -58,7 +57,7 @@ public class MoveFinder {
                     }
                     //hvis left part er fra brettet
                     if (k != 0 && charBoard[i][j-1] != '-') {
-                        MDAGNode n = (MDAGNode) dictionary.getSourceNode();
+                        MDAGNode n = (MDAGNode) Dictionary.getDictionary().getSourceNode();
                         for (int l = 0; l < k; l++) {
                             partialWord.append(charBoard[i][j - (k - l)]);
                             n = n.transition(Character.toUpperCase(charBoard[i][j - (k-l)]));
@@ -66,7 +65,7 @@ public class MoveFinder {
                         extendRight(boardDO, charBoard, rackString, crossChecks, partialWord.toString(), n, j, "");
 
                     } else {
-                        leftPart(boardDO, charBoard, rackString, crossChecks, "", (MDAGNode) dictionary.getSourceNode(), k, "");
+                        leftPart(boardDO, charBoard, rackString, crossChecks, "", (MDAGNode) Dictionary.getDictionary().getSourceNode(), k, "");
                     }
                 }
             }
@@ -176,7 +175,7 @@ public class MoveFinder {
     }
 
     //denne kan gjøres raskere, nå sjekker jeg alle felter
-    private String[][] findCrossChecks(MDAG dictionary, char[][] charBoard) {
+    private String[][] findCrossChecks(char[][] charBoard) {
 
         String alphaString = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ*";
         String[][] crossChecks = new String[15][15];
@@ -211,7 +210,7 @@ public class MoveFinder {
                         }
                         //sjekker alle bokstaver i alfabetet
                         for (int k = 0; k < 29; k++) {
-                            if (dictionary.contains(lettersOver.toString() + alphaString.charAt(k) + lettersUnder)) {
+                            if (Dictionary.getDictionary().contains(lettersOver.toString() + alphaString.charAt(k) + lettersUnder)) {
                                 crossChecks[i][j] += alphaString.charAt(k);
                             }
                         }

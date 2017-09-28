@@ -1,6 +1,5 @@
 import domain.BoardDO;
 import domain.MoveDO;
-import mdag.MDAG;
 import wordfeudapi.domain.Board;
 import wordfeudapi.domain.Game;
 import wordfeudapi.domain.Tile;
@@ -12,11 +11,9 @@ import java.util.stream.Stream;
 
 public class RelativeMoveScore {
 
-    private MDAG dictionary;
     private Board board;
 
-    RelativeMoveScore(final MDAG dictionary, final Board board) {
-        this.dictionary = dictionary;
+    RelativeMoveScore(final Board board) {
         this.board = board;
     }
 
@@ -50,7 +47,7 @@ public class RelativeMoveScore {
             MoveFinder moveFinder = new MoveFinder(board);
             double sum = 0;
             for (String opponentRack : randomOpponentRacks) {
-                List<TileMove> tileMoves = moveFinder.findAllMoves(dictionary, boardDO, opponentRack).stream()
+                List<TileMove> tileMoves = moveFinder.findAllMoves(boardDO, opponentRack).stream()
                         .map(MoveDO::toTileMove)
                         .sorted(Comparator.comparingInt(TileMove::getPoints))
                         .collect(Collectors.toList());
