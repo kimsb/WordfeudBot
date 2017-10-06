@@ -55,7 +55,6 @@ class Bot {
         Board board = botClient.getBoard(game);
         final TileMove bestRelativeMove = new RelativeMoveScore(board).findBestRelativeMove(game, bestMoves);
 
-
         if (bestMoves.isEmpty()) {
             if (game.getBagCount() >= 7) {
                 botClient.swap(id, game.getMyRack().chars());

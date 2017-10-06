@@ -59,7 +59,7 @@ public class RelativeMoveScore {
             double averageTopScore = sum / randomOpponentRacks.size();
             relativeMoveScores.put(tileMove.getPoints() - averageTopScore, tileMove);
         }
-        return relativeMoveScores.firstEntry().getValue();
+        return relativeMoveScores.isEmpty() ? relativeMoveScores.firstEntry().getValue() : null;
     }
 
     private List<String> getRandomOpponentRacks(final Game game) {
