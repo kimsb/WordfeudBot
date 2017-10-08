@@ -57,7 +57,7 @@ class Bot {
 
         if (bestMoves.isEmpty()) {
             if (game.getBagCount() >= 7) {
-                botClient.swap(id, game.getMyRack().chars());
+                botClient.swap(id, new Swap().getBestSwap(game.getMyRack().chars()));
             } else {
                 botClient.pass(id);
             }
