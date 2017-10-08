@@ -27,14 +27,14 @@ public class RelativeMoveScore {
     protected TileMove findBestRelativeMove(final List<String> randomOpponentRacks, final List<TileMove> bestCPUMoves,
                                             final Tile[] tilesOnBoard) {
 
-        //15p straff for bruk av blank
+        //20p straff for bruk av blank
         TreeMap<Double, TileMove> bestMovesTreeMap = new TreeMap<>(Collections.reverseOrder());
         double differential = 0.0000001;
         for (TileMove tileMove : bestCPUMoves) {
             if (tileMove.getWord().equals(tileMove.getWord().toUpperCase())) {
                 bestMovesTreeMap.put(tileMove.getPoints() + differential, tileMove);
             } else {
-                bestMovesTreeMap.put(tileMove.getPoints() + differential - 15, tileMove);
+                bestMovesTreeMap.put(tileMove.getPoints() + differential - 20, tileMove);
             }
             differential += 0.0000001;
         }
