@@ -53,7 +53,9 @@ class Bot {
         final List<TileMove> bestMoves = findBestMoves(game);
 
         Board board = botClient.getBoard(game);
+        final long start = System.currentTimeMillis();
         final TileMove bestRelativeMove = new RelativeMoveScore(board).findBestRelativeMove(game, bestMoves);
+        final long parallellTime = System.currentTimeMillis() - start;
 
         if (bestMoves.isEmpty()) {
             if (game.getBagCount() >= 7) {
@@ -64,7 +66,7 @@ class Bot {
         } else {
             TileMove bestOriginalMove = bestMoves.get(bestMoves.size() - 1);
             botClient.makeMove(game, bestRelativeMove);
-            String logmessage = "legger \"" + bestRelativeMove.getWord() + "\" "
+            String logmessage = "(" + parallellTime + "ms) legger \"" + bestRelativeMove.getWord() + "\" "
                     + "for " + bestRelativeMove.getPoints() + "p " + movePosition(bestRelativeMove);
             if (!(movePosition(bestOriginalMove).equals(movePosition(bestRelativeMove))
                     && bestOriginalMove.getWord().equals(bestRelativeMove.getWord()))) {
