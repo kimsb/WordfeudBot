@@ -80,7 +80,7 @@ public class RelativeMoveScore {
         for (int i = 0; i < 15; i++) {
             Collections.shuffle(remainingLetters);
             StringBuilder letters = new StringBuilder();
-            for (int j = 0; j < 7 && j <= remainingLetters.size(); j++) {
+            for (int j = 0; j < 7 && j < remainingLetters.size(); j++) {
                 letters.append(remainingLetters.get(j));
             }
             opponentRacks.add(letters.toString().replace("-", "*"));
