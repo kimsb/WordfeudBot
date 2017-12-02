@@ -1,6 +1,7 @@
 package domain;
 
 import constants.ScoreConstants;
+import util.Encoder;
 import wordfeudapi.domain.Board;
 import wordfeudapi.domain.Tile;
 import wordfeudapi.domain.TileMove;
@@ -138,7 +139,7 @@ public class MoveDO {
 
     public TileMove toTileMove() {
         Tile[] tiles = addedTiles.toArray(new Tile[addedTiles.size()]);
-        return new TileMove(tiles, word, moveScore, horizontal);
+        return new TileMove(Encoder.encodeTiles(tiles), Encoder.encodeWord(word), moveScore, horizontal);
     }
 
 }

@@ -51,9 +51,5 @@ public interface WordFeudClient {
 
     String getChatMessages(long gameId);
 
-    String uploadAvatar(File file) throws IOException;
-
-    String uploadAvatar(byte[] imageData);
-
     String createAccount(String username, String email, String password);
 }

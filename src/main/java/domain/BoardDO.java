@@ -1,5 +1,6 @@
 package domain;
 
+import util.Encoder;
 import wordfeudapi.domain.Tile;
 
 public class BoardDO {
@@ -18,7 +19,7 @@ public class BoardDO {
         charBoard = getEmptyCharBoard();
         for (Tile tile : tiles) {
             charBoard[tile.getX()][tile.getY()]
-                    = tile.isWildcard() ? Character.toLowerCase(tile.getCharacter()) : tile.getCharacter();
+                    = tile.isWildcard() ? Encoder.fromNorwegian(Character.toLowerCase(tile.getCharacter())) : Encoder.fromNorwegian(tile.getCharacter());
         }
     }
 

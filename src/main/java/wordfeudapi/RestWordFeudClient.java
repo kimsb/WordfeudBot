@@ -3,7 +3,6 @@ package wordfeudapi;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-import sun.misc.BASE64Encoder;
 import util.SHA1;
 import wordfeudapi.domain.*;
 import wordfeudapi.exception.WordFeudException;
@@ -373,34 +372,6 @@ public class RestWordFeudClient implements WordFeudClient {
 
         final JSONObject json = callAPI(path);
         return json.toString();
-    }
-
-    /**
-     * Upload a new avatar of the currently logged in user
-     * @param file The JPEG file (I think it has to be 60x60 as well..)
-     * @return The WordFeud API response
-     * @throws IOException If something bad happened reading the file
-     */
-    @Override
-    public String uploadAvatar(File file) throws IOException {
-        return uploadAvatar(readImage(file));
-    }
-
-    /**
-     * Upload a new avatar of the currently logged in user
-     * 
-     * @param imageData
-     *            The image data
-     * @return The WordFeud API response
-     */
-    @Override
-    public String uploadAvatar(byte[] imageData) {
-        final String path = "/user/avatar/upload/";
-
-        final HashMap<String, String> parameters = new HashMap<String, String>();
-        parameters.put("image_data", new BASE64Encoder().encode(imageData));
-
-        return callAPI(path, toJSON(parameters)).toString();
     }
 
     /**

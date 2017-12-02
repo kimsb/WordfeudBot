@@ -1,3 +1,5 @@
+import util.Encoder;
+
 public class Swap {
     private static final String ernatslik = "-ERNATSLIK";
     private static final double MIN_VOWEL_RATIO = 0.25;
@@ -5,6 +7,9 @@ public class Swap {
 
 
     public char[] getBestSwap(final char[] rack) {
+        for (int i = 0; i < rack.length; i++) {
+            rack[i] = Encoder.fromNorwegian(rack[i]);
+        }
         System.out.print("Bot kaller Swap. Rack: " + new String(rack));
         StringBuilder ernatslikTiles = new StringBuilder();
         for (char letter : rack) {
@@ -71,9 +76,9 @@ public class Swap {
             case 'O':
             case 'U':
             case 'Y':
-            case 'Æ':
-            case 'Ø':
-            case 'Å':
+            case 'Q':
+            case 'Z':
+            case 'X':
             case '-':
                 return true;
             default:

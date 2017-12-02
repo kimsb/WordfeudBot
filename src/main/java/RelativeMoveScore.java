@@ -90,7 +90,7 @@ public class RelativeMoveScore {
 
     protected List<String> findRemainingLetters(final String cpuRack, final Tile[] tiles) {
         final String cpuRackFormattedBlank = cpuRack.replace('*', '-');
-        String allTiles = "AAAAAAABBBCDDDDDEEEEEEEEEFFFFGGGGHHHIIIIIIJJKKKKLLLLLMMMNNNNNNOOOOPPRRRRRRRSSSSSSSTTTTTTTUUUVVVWYÆØØÅÅ--";
+        String allTiles = "AAAAAAABBBCDDDDDEEEEEEEEEFFFFGGGGHHHIIIIIIJJKKKKLLLLLMMMNNNNNNOOOOPPRRRRRRRSSSSSSSTTTTTTTUUUVVVWYQZZXX--";
         for (Tile tile : tiles) {
             allTiles = allTiles.replaceFirst(Character.toString(tile.getCharacter()), "");
         }

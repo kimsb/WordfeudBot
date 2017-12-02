@@ -1,5 +1,6 @@
 import domain.BoardDO;
 import domain.MoveDO;
+import util.Encoder;
 import wordfeudapi.RestWordFeudClient;
 import wordfeudapi.domain.*;
 
@@ -164,7 +165,12 @@ class Bot {
         Board board = botClient.getBoard(game);
         Tile[] tiles = game.getTiles();
 
-        ArrayList<MoveDO> allMoves = new MoveFinder(board).findAllMoves(new BoardDO(tiles), new String(rack.chars()));
+        char[] chars = rack.chars();
+        for (int i = 0; i < chars.length; i++) {
+            chars[i] = Encoder.fromNorwegian(chars[i]);
+        }
+
+        ArrayList<MoveDO> allMoves = new MoveFinder(board).findAllMoves(new BoardDO(tiles), new String(chars));
 
         return allMoves.stream()
                 .map(MoveDO::toTileMove)

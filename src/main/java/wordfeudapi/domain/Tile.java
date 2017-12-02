@@ -8,7 +8,7 @@ public class Tile {
 
     private final int x;
     private final int y;
-    private final String character;
+    private String character;
     private final boolean wildcard;
 
     public Tile(final int x, final int y, final char character, final boolean wildcard) {
@@ -23,6 +23,10 @@ public class Tile {
         y = ((Double) tile[1]).intValue();
         character = (String) tile[2];
         wildcard = (Boolean) tile[3];
+    }
+
+    public void setCharacter(String character) {
+        this.character = character;
     }
 
     public int getX() {
