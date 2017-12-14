@@ -209,7 +209,7 @@ public class MoveFinder {
                             lettersUnder.append(charBoard[i + k][j]);
                         }
                         //sjekker alle bokstaver i alfabetet
-                        for (int k = 0; k < 29; k++) {
+                        for (int k = 0; k < alphaString.length(); k++) {
                             if (Dictionary.getDictionary().contains(lettersOver.toString() + alphaString.charAt(k) + lettersUnder)) {
                                 crossChecks[i][j] += alphaString.charAt(k);
                             }

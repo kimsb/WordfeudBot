@@ -92,7 +92,7 @@ public class RestWordFeudClient implements WordFeudClient {
      * @return The id of the game that just started
      */
     @Override
-    public int acceptInvite(final int inviteId) {
+    public int acceptInvite(final long inviteId) {
         // 'access_denied'
         final String path = "/invite/" + inviteId + "/accept/";
 

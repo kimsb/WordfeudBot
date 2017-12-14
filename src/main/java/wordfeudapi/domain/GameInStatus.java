@@ -8,9 +8,9 @@ import static util.DateUtil.format;
 public class GameInStatus {
     private double updated;
     private int chat_count;
-    private int id;
+    private long id;
 
-    public GameInStatus(final int id, final double updated, final int chatCount) {
+    public GameInStatus(final long id, final double updated, final int chatCount) {
         this.id = id;
         this.updated = updated;
         this.chat_count = chatCount;
@@ -27,7 +27,7 @@ public class GameInStatus {
         return chat_count;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
