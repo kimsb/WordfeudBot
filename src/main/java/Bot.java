@@ -16,15 +16,18 @@ class Bot {
     private HashMap<Long, String> highestScoringMoves = new HashMap<>();
     private HashMap<Long, String> bingoMessages = new HashMap<>();
     private HashMap<Long, Integer> bagCount = new HashMap<>();
+    private String BOTUSERNAME;
+    private String KIMUSERNAME;
+    private String TOMUSERNAME;
 
 
     Bot() {
         botClient = new RestWordFeudClient();
         kimClient = new RestWordFeudClient();
         tomClient = new RestWordFeudClient();
-        kimClient.logon(System.getenv("KIMUSER"), System.getenv("KIMPASSWORD"));
-        tomClient.logon(System.getenv("TOMUSER"), System.getenv("TOMPASSWORD"));
-        botClient.logon(System.getenv("BOTUSER"), System.getenv("BOTPASSWORD"));
+        KIMUSERNAME = kimClient.logon(System.getenv("KIMUSER"), System.getenv("KIMPASSWORD")).getUsername();
+        TOMUSERNAME = tomClient.logon(System.getenv("TOMUSER"), System.getenv("TOMPASSWORD")).getUsername();
+        BOTUSERNAME = botClient.logon(System.getenv("BOTUSER"), System.getenv("BOTPASSWORD")).getUsername();
         botLoop();
     }
 
@@ -57,7 +60,7 @@ class Bot {
             if (entry.isChatMessage()) {
                 long gameId = entry.getGameId();
                 botClient.chat(gameId, highestScoringMoves.get(gameId));
-                log(botClient.getGame(gameId), "sender chatmelding med tips om høyest scorende legg");
+                log(entry.getUsername(), entry.getGameId(), "sender chatmelding med tips om høyest scorende legg");
             }
         }
     }
@@ -86,7 +89,7 @@ class Bot {
                 logmessage += ", ikke \"" + bestOriginalMove.getWord() + "\" "
                         + "for " + bestOriginalMove.getPoints() + "p " + movePosition(bestOriginalMove);
             }
-            log(game, logmessage);
+            log(getOpponent(game), game.getId(), logmessage);
         }
     }
 
@@ -95,7 +98,7 @@ class Bot {
         if (bagCount.containsKey(gameId) && bagCount.get(gameId) != currentBagCount + 7) {
             if (bingoMessages.containsKey(gameId) && bingoMessages.get(gameId) != null) {
                 botClient.chat(gameId, bingoMessages.get(gameId));
-                log(game, "sender chatmelding med bingotips");
+                log(getOpponent(game), gameId, "sender chatmelding med bingotips");
             }
         }
         bingoMessages.remove(gameId);
@@ -107,9 +110,9 @@ class Bot {
             if (bingoMessages.containsKey(id)) {
                 break;
             }
-            if ("moomin85".equals(game.getOpponentName())) {
+            if (KIMUSERNAME.equals(game.getOpponentName())) {
                 createChatMessage(id, kimClient);
-            } else if ("tobov!".equals(game.getOpponentName())) {
+            } else if (TOMUSERNAME.equals(game.getOpponentName())) {
                 createChatMessage(id, tomClient);
             }
         }
@@ -132,10 +135,9 @@ class Bot {
     private void acceptInvites() {
         //TODO: bare accept norsk-bokmål
         Stream.of(botClient.getStatus().getInvitesReceived())
-                .map(Invite::getId)
-                .forEach(id -> {
-                    final long gameId = botClient.acceptInvite(id);
-                    log(botClient.getGame(gameId), "accepted invite");
+                .forEach(invite -> {
+                    final long gameId = botClient.acceptInvite(invite.getId());
+                    log(invite.getInviter(), gameId, "accepted invite");
                 });
     }
 
@@ -146,14 +148,13 @@ class Bot {
                 .filter(tileMove -> tileMove.getTiles().length == 7)
                 .collect(Collectors.toList());
         if (bestMoves.isEmpty()) {
-            highestScoringMoves.put(gameId, null);
             highestScoringMoves.put(gameId, "Du kan ikke gjøre noen gyldige legg");
-            bingoMessages.put(gameId, null);
+            bingoMessages.remove(gameId);
             return;
         }
         highestScoringMoves.put(gameId, "Høyest scorende legg: " + moveStringBuilder(bestMoves.get(bestMoves.size() - 1)));
         if (bingos.isEmpty()) {
-            bingoMessages.put(gameId, null);
+            bingoMessages.remove(gameId);
             return;
         }
         StringBuilder message = new StringBuilder();
@@ -166,7 +167,7 @@ class Bot {
         if (!bingos.isEmpty()) {
             message.append("\n...");
         }
-        log(game, "kan legge bingo: " + message.toString().replaceFirst("\n", "")
+        log(getOpponent(game), gameId, "kan legge bingo: " + message.toString().replaceFirst("\n", "")
                 .replace("\n", ", "));
         bingoMessages.put(gameId, "Du kunne lagt bingo:" + message.toString());
         bagCount.put(gameId, Byte.toUnsignedInt(game.getBagCount()));
@@ -198,9 +199,12 @@ class Bot {
                 .collect(Collectors.toList());
     }
 
-    private void log(final Game game, final String logMessage) {
-        final String opponent = "moominbot".equals(game.getFirstPlayerName()) ? game.getSecondPlayerName() : game.getFirstPlayerName();
-        System.out.println(opponent + " (" + game.getId() + "): " + logMessage);
+    private void log(final String opponent, final Long gameId, final String logMessage) {
+        System.out.println(opponent + " (" + gameId + "): " + logMessage);
+    }
+
+    private String getOpponent(final Game game) {
+        return BOTUSERNAME.equals(game.getFirstPlayerName()) ? game.getSecondPlayerName() : game.getFirstPlayerName();
     }
 
 }
