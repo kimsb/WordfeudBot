@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 class Bot {
 
     private RestWordFeudClient botClient, kimClient, tomClient;
+    private HashMap<Long, String> highestScoringMoves = new HashMap<>();
     private HashMap<Long, String> bingoMessages = new HashMap<>();
     private HashMap<Long, Integer> bagCount = new HashMap<>();
 
@@ -30,7 +31,8 @@ class Bot {
     private void botLoop() {
         while (true) {
             acceptInvites();
-            createBingoTips(getTheirTurnGameIds());
+            createTips(getTheirTurnGameIds());
+            giveTips();
             final List<Long> myTurnGameIds = getMyTurnGameIds();
 
             if (myTurnGameIds.isEmpty()) {
@@ -45,6 +47,17 @@ class Bot {
                 Game game = botClient.getGame(id);
                 giveBingoTips(id, game);
                 makeBestMove(id, game);
+            }
+        }
+    }
+
+    private void giveTips() {
+        Notifications notifications = botClient.getNotifications();
+        for (NotificationEntry entry : notifications.getEntries()) {
+            if (entry.isChatMessage()) {
+                long gameId = entry.getGameId();
+                botClient.chat(gameId, highestScoringMoves.get(gameId));
+                log(botClient.getGame(gameId), "sender chatmelding med tips om høyest scorende legg");
             }
         }
     }
@@ -88,7 +101,7 @@ class Bot {
         bingoMessages.remove(gameId);
     }
 
-    private void createBingoTips(final List<Long> theirTurnGameIds) {
+    private void createTips(final List<Long> theirTurnGameIds) {
         for (Long id : theirTurnGameIds) {
             final Game game = botClient.getGame(id);
             if (bingoMessages.containsKey(id)) {
@@ -121,16 +134,24 @@ class Bot {
         Stream.of(botClient.getStatus().getInvitesReceived())
                 .map(Invite::getId)
                 .forEach(id -> {
-                    final int gameId = botClient.acceptInvite(id);
+                    final long gameId = botClient.acceptInvite(id);
                     log(botClient.getGame(gameId), "accepted invite");
                 });
     }
 
     private void createChatMessage(final Long gameId, final RestWordFeudClient client) {
         final Game game = client.getGame(gameId);
-        final List<TileMove> bingos = findBestMoves(game).stream()
+        final List<TileMove> bestMoves = findBestMoves(game);
+        final List<TileMove> bingos = bestMoves.stream()
                 .filter(tileMove -> tileMove.getTiles().length == 7)
                 .collect(Collectors.toList());
+        if (bestMoves.isEmpty()) {
+            highestScoringMoves.put(gameId, null);
+            highestScoringMoves.put(gameId, "Du kan ikke gjøre noen gyldige legg");
+            bingoMessages.put(gameId, null);
+            return;
+        }
+        highestScoringMoves.put(gameId, "Høyest scorende legg: " + moveStringBuilder(bestMoves.get(bestMoves.size() - 1)));
         if (bingos.isEmpty()) {
             bingoMessages.put(gameId, null);
             return;
@@ -139,8 +160,7 @@ class Bot {
         int tipsCount = 0;
         while (!bingos.isEmpty() && tipsCount < 3) {
             TileMove bingo = bingos.remove(bingos.size() - 1);
-            message.append("\n").append(bingo.getPoints()).append(": ").append(bingo.getWord());
-            message.append(" ").append(movePosition(bingo));
+            message.append(moveStringBuilder(bingo));
             tipsCount++;
         }
         if (!bingos.isEmpty()) {
@@ -150,6 +170,12 @@ class Bot {
                 .replace("\n", ", "));
         bingoMessages.put(gameId, "Du kunne lagt bingo:" + message.toString());
         bagCount.put(gameId, Byte.toUnsignedInt(game.getBagCount()));
+
+    }
+
+    private StringBuilder moveStringBuilder(final TileMove tileMove) {
+        return new StringBuilder("\n").append(tileMove.getPoints()).append(": ").append(tileMove.getWord())
+                .append(" ").append(movePosition(tileMove));
     }
 
     private String movePosition(final TileMove tileMove) {
