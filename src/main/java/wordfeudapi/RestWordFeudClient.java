@@ -111,7 +111,7 @@ public class RestWordFeudClient implements WordFeudClient {
      * @return The WordFeud API response
      */
     @Override
-    public String rejectInvite(final int inviteId) {
+    public String rejectInvite(final long inviteId) {
         final String path = "/invite/" + inviteId + "/reject/";
 
         return callAPI(path).toString();

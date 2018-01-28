@@ -48,8 +48,12 @@ class Bot {
 
             for (Long id : myTurnGameIds) {
                 Game game = botClient.getGame(id);
-                giveBingoTips(id, game);
-                makeBestMove(id, game);
+                if (game.getRuleset().getApiIntRepresentation() != 1) {
+                    botClient.pass(id);
+                } else {
+                    giveBingoTips(id, game);
+                    makeBestMove(id, game);
+                }
             }
         }
     }
@@ -136,6 +140,9 @@ class Bot {
         //TODO: bare accept norsk-bokmål
         Stream.of(botClient.getStatus().getInvitesReceived())
                 .forEach(invite -> {
+                    if (invite.getRuleset().getApiIntRepresentation() != 1) {
+                        botClient.rejectInvite(invite.getId());
+                    }
                     final long gameId = botClient.acceptInvite(invite.getId());
                     log(invite.getInviter(), gameId, "accepted invite");
                 });
