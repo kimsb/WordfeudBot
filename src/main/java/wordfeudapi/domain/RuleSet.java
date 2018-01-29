@@ -42,7 +42,9 @@ public enum RuleSet {
                 return ruleSet;
             }
         }
-        throw new IllegalArgumentException("RuleSet for value " + number + " not found!");
+        //TODO remove this hack
+        return values()[0];
+        //throw new IllegalArgumentException("RuleSet for value " + number + " not found!");
     }
 
     public static RuleSet fromString(final String string) {
