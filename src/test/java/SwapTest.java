@@ -1,5 +1,6 @@
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class SwapTest {
 
@@ -9,7 +10,7 @@ public class SwapTest {
         char[] chars = {'L', 'E', 'R', 'N', 'W', 'T', 'S'};
         char[] bestSwap = swap.getBestSwap(chars);
 
-        Assert.assertTrue("LWS".equals(new String(bestSwap)));
+        assertEquals("LWS", new String(bestSwap));
     }
 
     @Test
@@ -18,6 +19,6 @@ public class SwapTest {
         char[] chars = {'U', 'I', 'I', 'G', 'D', 'A', 'R'};
         char[] bestSwap = swap.getBestSwap(chars);
 
-        Assert.assertTrue("UIGD".equals(new String(bestSwap)));
+        assertEquals("UIGD", new String(bestSwap));
     }
 }

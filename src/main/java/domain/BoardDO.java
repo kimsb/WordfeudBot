@@ -10,7 +10,7 @@ public class BoardDO {
         charBoard = getEmptyCharBoard();
     }
 
-    BoardDO(char[][] charBoard) {
+    public BoardDO(char[][] charBoard) {
         this.charBoard = charBoard;
     }
 

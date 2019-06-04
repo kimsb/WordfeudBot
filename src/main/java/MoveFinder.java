@@ -114,9 +114,7 @@ public class MoveFinder {
                                 //let N' be the node reached by following edge E
                                 MDAGNode nNext = entry.getValue();
                                 //let next-square be the square to the right of square
-                                if (squareJ != 14) {
                                     extendRight(boardDO, charBoard, rackString, crossChecks, (partialWord + Character.toLowerCase(l)), nNext, squareJ+1, usedFromRack + Character.toLowerCase(l));
-                                }
                                 //put the blank tile back in the rack
                                 rackString += '*';
                             }
@@ -129,10 +127,10 @@ public class MoveFinder {
             //let l be the letter occupying square
             char l = charBoard[currentAnchorI][squareJ];
             //if N has an edge labeled by l that leads to some node N'
-            if (n.hasOutgoingTransition(l)) {
+            if (n.hasOutgoingTransition(Character.toUpperCase(l))) {
                 //let next-square be the square to the right of square
                 //if (squareJ != 14) {
-                extendRight(boardDO, charBoard, rackString, crossChecks, (partialWord + l), n.transition(l), squareJ+1, usedFromRack);
+                extendRight(boardDO, charBoard, rackString, crossChecks, (partialWord + l), n.transition(Character.toUpperCase(l)), squareJ+1, usedFromRack);
                 //}
             }
         }
@@ -210,7 +208,7 @@ public class MoveFinder {
                         }
                         //sjekker alle bokstaver i alfabetet
                         for (int k = 0; k < alphaString.length(); k++) {
-                            if (Dictionary.getDictionary().contains(lettersOver.toString() + alphaString.charAt(k) + lettersUnder)) {
+                            if (Dictionary.getDictionary().contains((lettersOver.toString() + alphaString.charAt(k) + lettersUnder).toUpperCase())) {
                                 crossChecks[i][j] += alphaString.charAt(k);
                             }
                         }
