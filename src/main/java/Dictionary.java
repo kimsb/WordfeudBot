@@ -13,7 +13,7 @@ class Dictionary {
     static void initialize() {
         Dictionary dictionary = new Dictionary();
         ClassLoader classLoader = dictionary.getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream("nsf2016.txt");
+        InputStream inputStream = classLoader.getResourceAsStream("nsf2019.txt");
         List<String> words = new BufferedReader(new InputStreamReader(inputStream))
                 .lines().collect(Collectors.toList());
         Dictionary.dictionary = (new MDAG(words));
