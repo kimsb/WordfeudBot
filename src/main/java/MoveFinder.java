@@ -52,15 +52,15 @@ public class MoveFinder {
                     currentAnchorJ = j;
                     StringBuilder partialWord = new StringBuilder();
                     int k = 0;
-                    while (j - k != 0 && !isAnchor[i][j-(k+1)]) {
+                    while (j - k != 0 && !isAnchor[i][j - (k + 1)]) {
                         k++;
                     }
                     //hvis left part er fra brettet
-                    if (k != 0 && charBoard[i][j-1] != '-') {
+                    if (k != 0 && charBoard[i][j - 1] != '-') {
                         MDAGNode n = (MDAGNode) Dictionary.getDictionary().getSourceNode();
                         for (int l = 0; l < k; l++) {
                             partialWord.append(charBoard[i][j - (k - l)]);
-                            n = n.transition(Character.toUpperCase(charBoard[i][j - (k-l)]));
+                            n = n.transition(Character.toUpperCase(charBoard[i][j - (k - l)]));
                         }
                         extendRight(boardDO, charBoard, rackString, crossChecks, partialWord.toString(), n, j, "");
 
@@ -77,7 +77,7 @@ public class MoveFinder {
         if (squareJ == 15 || charBoard[currentAnchorI][squareJ] == '-') {
             //if N si a terminal node
             if (squareJ != currentAnchorJ && n.isAcceptNode()) {
-                MoveDO newPos = new MoveDO(currentAnchorI, (squareJ-partialWord.length()), transposed,
+                MoveDO newPos = new MoveDO(currentAnchorI, (squareJ - partialWord.length()), transposed,
                         usedFromRack, (transposed ? boardDO.getTransposedCharBoard() : boardDO.getCharBoard()), rackString, board);
 
                 allMoves.add(newPos);
@@ -85,8 +85,8 @@ public class MoveFinder {
             if (squareJ < 15) {
 
                 //for each edge E out of N
-                TreeMap<Character,MDAGNode> outGoingEdges = n.getOutgoingTransitions();
-                for (Map.Entry<Character,MDAGNode> entry : outGoingEdges.entrySet()) {
+                TreeMap<Character, MDAGNode> outGoingEdges = n.getOutgoingTransitions();
+                for (Map.Entry<Character, MDAGNode> entry : outGoingEdges.entrySet()) {
                     //if the letter l labeling edge e is in our rack
                     char l = entry.getKey();
                     int index = rackString.indexOf(l);
@@ -94,35 +94,33 @@ public class MoveFinder {
                         //and l is in the crossCheck set of square
                         if (crossChecks[currentAnchorI][squareJ].indexOf(l) != -1) {
                             //then remove a tile labeled l from the rack
-                            rackString = rackString.substring(0,index) + rackString.substring(index+1);
+                            rackString = rackString.substring(0, index) + rackString.substring(index + 1);
                             //let N' be the node reached by following edge E
                             MDAGNode nNext = entry.getValue();
                             //let next-square be the square to the right of square
                             //if (squareJ != 14) {
-                            extendRight(boardDO, charBoard, rackString, crossChecks, (partialWord + l), nNext, squareJ+1, usedFromRack + l);
+                            extendRight(boardDO, charBoard, rackString, crossChecks, (partialWord + l), nNext, squareJ + 1, usedFromRack + l);
                             //}
                             //put the tile back in the rack
                             rackString += l;
                         }
-                    } else { // check for blank
-                        index = rackString.indexOf('*');
-                        if (index != -1) {
-                            //and l is in the crossCheck set of square
-                            if (crossChecks[currentAnchorI][squareJ].indexOf(l) != -1) {
-                                //then remove blank tile from the rack
-                                rackString = rackString.substring(0,index) + rackString.substring(index+1);
-                                //let N' be the node reached by following edge E
-                                MDAGNode nNext = entry.getValue();
-                                //let next-square be the square to the right of square
-                                    extendRight(boardDO, charBoard, rackString, crossChecks, (partialWord + Character.toLowerCase(l)), nNext, squareJ+1, usedFromRack + Character.toLowerCase(l));
-                                //put the blank tile back in the rack
-                                rackString += '*';
-                            }
+                    } // check for blank
+                    index = rackString.indexOf('*');
+                    if (index != -1) {
+                        //and l is in the crossCheck set of square
+                        if (crossChecks[currentAnchorI][squareJ].indexOf(l) != -1) {
+                            //then remove blank tile from the rack
+                            rackString = rackString.substring(0, index) + rackString.substring(index + 1);
+                            //let N' be the node reached by following edge E
+                            MDAGNode nNext = entry.getValue();
+                            //let next-square be the square to the right of square
+                            extendRight(boardDO, charBoard, rackString, crossChecks, (partialWord + Character.toLowerCase(l)), nNext, squareJ + 1, usedFromRack + Character.toLowerCase(l));
+                            //put the blank tile back in the rack
+                            rackString += '*';
                         }
                     }
                 }
             }
-            //}
         } else { //if square not vacant
             //let l be the letter occupying square
             char l = charBoard[currentAnchorI][squareJ];
@@ -130,7 +128,7 @@ public class MoveFinder {
             if (n.hasOutgoingTransition(Character.toUpperCase(l))) {
                 //let next-square be the square to the right of square
                 //if (squareJ != 14) {
-                extendRight(boardDO, charBoard, rackString, crossChecks, (partialWord + l), n.transition(Character.toUpperCase(l)), squareJ+1, usedFromRack);
+                extendRight(boardDO, charBoard, rackString, crossChecks, (partialWord + l), n.transition(Character.toUpperCase(l)), squareJ + 1, usedFromRack);
                 //}
             }
         }
@@ -140,34 +138,32 @@ public class MoveFinder {
         extendRight(boardDO, charBoard, rackString, crossChecks, partialWord, n, currentAnchorJ, usedFromRack);
         if (limit > 0) {
             //for each edge E out of N
-            TreeMap<Character,MDAGNode> outGoingEdges = n.getOutgoingTransitions();
-            for (Map.Entry<Character,MDAGNode> entry : outGoingEdges.entrySet()) {
+            TreeMap<Character, MDAGNode> outGoingEdges = n.getOutgoingTransitions();
+            for (Map.Entry<Character, MDAGNode> entry : outGoingEdges.entrySet()) {
                 //if the letter l labeling edge e is in our rack
                 char l = entry.getKey();
                 int index = rackString.indexOf(l);
                 if (index != -1) {
                     //then remove a tile labeled l from the rack
-                    rackString = rackString.substring(0,index) + rackString.substring(index+1);
+                    rackString = rackString.substring(0, index) + rackString.substring(index + 1);
                     //let N' be the node reached by following edge E
                     MDAGNode nNext = entry.getValue();
                     //leftPart(...)
-                    leftPart(boardDO, charBoard, rackString, crossChecks, (partialWord + l), nNext, limit-1, usedFromRack + l);
+                    leftPart(boardDO, charBoard, rackString, crossChecks, (partialWord + l), nNext, limit - 1, usedFromRack + l);
                     //put the tile back in the rack
                     rackString += l;
-                } else { //if not on rack, check for blanks
-                    index = rackString.indexOf('*');
-                    if (index != -1) {
-                        //then remove blank tile from the rack
-                        rackString = rackString.substring(0,index) + rackString.substring(index+1);
-                        //let N' be the node reached by following edge E
-                        MDAGNode nNext = entry.getValue();
-                        //leftPart(...)
-                        leftPart(boardDO, charBoard, rackString, crossChecks, (partialWord + Character.toLowerCase(l)), nNext, limit-1, usedFromRack + Character.toLowerCase(l));
-                        //put the blank tile back in the rack
-                        rackString += '*';
-                    }
+                } //check for blanks
+                index = rackString.indexOf('*');
+                if (index != -1) {
+                    //then remove blank tile from the rack
+                    rackString = rackString.substring(0, index) + rackString.substring(index + 1);
+                    //let N' be the node reached by following edge E
+                    MDAGNode nNext = entry.getValue();
+                    //leftPart(...)
+                    leftPart(boardDO, charBoard, rackString, crossChecks, (partialWord + Character.toLowerCase(l)), nNext, limit - 1, usedFromRack + Character.toLowerCase(l));
+                    //put the blank tile back in the rack
+                    rackString += '*';
                 }
-
             }
         }
     }
@@ -190,10 +186,10 @@ public class MoveFinder {
                 if (charBoard[i][j] == '-') {
                     int tilesOver = 0;
                     int tilesUnder = 0;
-                    while(i - tilesOver != 0 && charBoard[i-(tilesOver+1)][j] != '-') {
+                    while (i - tilesOver != 0 && charBoard[i - (tilesOver + 1)][j] != '-') {
                         tilesOver++;
                     }
-                    while(i + tilesUnder != 14 && charBoard[i+(tilesUnder+1)][j] != '-') {
+                    while (i + tilesUnder != 14 && charBoard[i + (tilesUnder + 1)][j] != '-') {
                         tilesUnder++;
                     }
                     if (tilesOver != 0 || tilesUnder != 0) {

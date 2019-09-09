@@ -73,16 +73,46 @@ public class MoveFinderTest {
                 {'-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'},
                 {'-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'}};
 
-        ArrayList<MoveDO> allMoves = moveFinder.findAllMoves(new BoardDO(charBoard), "HIMLAN*");
+        ArrayList<MoveDO> allMoves = moveFinder.findAllMoves(new BoardDO(charBoard), "HIMLANÅ");
 
         List<TileMove> sorted = allMoves.stream()
                 .map(MoveDO::toTileMove)
                 .sorted(Comparator.comparingInt(TileMove::getPoints))
                 .collect(Collectors.toList());
 
-        assertThat(sorted.get(sorted.size()-1).getWord(), is("HEIMLANd"));
-        assertThat(sorted.get(sorted.size()-1).getPoints(), is(112));
+        assertThat(sorted.get(sorted.size()-1).getWord(), is("HEIMLÅNA"));
+        assertThat(sorted.get(sorted.size()-1).getPoints(), is(136));
 
+    }
+
+    @Test
+    public void findHighestScoringMovePartII() {
+        char[][] charBoard = {
+                {'-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'},
+                {'-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'},
+                {'-', '-', '-', '-', '-', '-', 'J', 'A', 'R', '-', '-', '-', 'S', '-', '-'},
+                {'-', '-', '-', '-', 'p', 'R', 'O', 'S', 'O', 'D', 'I', '-', 'P', '-', '-'},
+                {'-', '-', '-', 'S', 'M', 'A', 'K', '-', '-', '-', 'T', 'R', 'A', 'C', 'E'},
+                {'-', '-', '-', 'M', '-', '-', '-', '-', '-', '-', '-', '-', 'H', 'U', '-'},
+                {'-', '-', '-', 'Ø', '-', '-', 'K', 'I', 'T', 'S', 'J', '-', 'I', 'T', '-'},
+                {'-', '-', '-', 'R', '-', 'W', 'I', 'T', '-', '-', 'Æ', 'R', 'E', '-', '-'},
+                {'-', '-', '-', 'F', '-', '-', '-', '-', '-', '-', 'V', 'A', 'N', '-', '-'},
+                {'-', '-', '-', 'O', '-', '-', '-', '-', '-', '-', 'L', 'A', '-', '-', '-'},
+                {'B', 'O', 'E', 'R', '-', 'F', 'L', 'I', 'D', 'D', 'E', '-', '-', '-', '-'},
+                {'-', '-', '-', 'M', '-', '-', '-', '-', '-', '-', 'T', 'U', '-', '-', '-'},
+                {'-', '-', 'G', 'A', 'N', 'G', 'E', 'N', 'E', '-', '-', 'H', '-', '-', '-'},
+                {'-', '-', '-', '-', '-', 'Å', 'P', '-', '-', '-', '-', '-', '-', '-', '-'},
+                {'-', '-', '-', 'F', 'Y', 'S', '-', '-', '-', '-', '-', '-', '-', '-', '-'}};
+
+        ArrayList<MoveDO> allMoves = moveFinder.findAllMoves(new BoardDO(charBoard), "DULRES*");
+
+        List<TileMove> sorted = allMoves.stream()
+                .map(MoveDO::toTileMove)
+                .sorted(Comparator.comparingInt(TileMove::getPoints))
+                .collect(Collectors.toList());
+
+        assertThat(sorted.get(sorted.size()-1).getWord(), is("DULeRES"));
+        assertThat(sorted.get(sorted.size()-1).getPoints(), is(67));
     }
 
     private static Board getStandardBoard() {
