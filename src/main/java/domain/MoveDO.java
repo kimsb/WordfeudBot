@@ -23,7 +23,6 @@ public class MoveDO {
     String usedFromRack;
     String leftOnRack;
     private ArrayList<String> words = new ArrayList<>();
-    String AIString = "";
     ArrayList<Tile> addedTiles = new ArrayList<>();
     Board board;
 
@@ -106,18 +105,6 @@ public class MoveDO {
 
     private boolean isBingo() {
         return usedFromRack.length() == 7;
-    }
-
-    public ArrayList<String> getWords() {
-        return words;
-    }
-
-    public String getTipsPlacementString() {
-
-        int boardRow = horizontal ? startColumn + 1 : row + 1;
-        int boardColumn = horizontal ? row : startColumn;
-        String arrow = horizontal ? "&darr;" : "&rarr;";
-        return " (" + "ABCDEFGHIJKLMNO".charAt(boardColumn) + "  " + boardRow + ") " + arrow;
     }
 
     private int getLetterMultiplier(int x, int y) {

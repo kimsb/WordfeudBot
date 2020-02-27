@@ -3,18 +3,18 @@ package wordfeudapi;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-import sun.misc.BASE64Encoder;
-import util.SHA1;
 import wordfeudapi.domain.*;
 import wordfeudapi.exception.WordFeudException;
 import wordfeudapi.exception.WordFeudLoginRequiredException;
 import wordfeudapi.http.ApacheHttpClientCommunicator;
 import wordfeudapi.http.HttpCommunicator;
+import wordfeudapi.util.SHA1;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.HashMap;
 
 /**
@@ -398,7 +398,7 @@ public class RestWordFeudClient implements WordFeudClient {
         final String path = "/user/avatar/upload/";
 
         final HashMap<String, String> parameters = new HashMap<String, String>();
-        parameters.put("image_data", new BASE64Encoder().encode(imageData));
+        parameters.put("image_data", Base64.getEncoder().encodeToString(imageData));
 
         return callAPI(path, toJSON(parameters)).toString();
     }

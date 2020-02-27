@@ -1,8 +1,8 @@
 package wordfeudapi.domain;
 
-import util.ArrayUtil;
+import wordfeudapi.util.ArrayUtil;
 
-import static util.DateUtil.format;
+import static wordfeudapi.util.DateUtil.format;
 
 /**
  * @author Pierre Ingmansson

@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import java.util.Arrays;
 import java.util.Locale;
 
-import static util.DateUtil.format;
+import static wordfeudapi.util.DateUtil.format;
 
 /**
  * @author Pierre Ingmansson

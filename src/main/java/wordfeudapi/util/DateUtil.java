@@ -1,4 +1,4 @@
-package util;
+package wordfeudapi.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

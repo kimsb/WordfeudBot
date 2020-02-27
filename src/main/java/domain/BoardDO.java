@@ -6,10 +6,6 @@ public class BoardDO {
 
     public char[][] charBoard;
 
-    BoardDO() {
-        charBoard = getEmptyCharBoard();
-    }
-
     public BoardDO(char[][] charBoard) {
         this.charBoard = charBoard;
     }
@@ -50,20 +46,6 @@ public class BoardDO {
         return transposedCharBoard;
     }
 
-//    public void addToCharBoard(Move move) {
-//        for (int i = 0; i < move.word.length(); i++) {
-//            if (move.horizontal) {
-//                if (charBoard[move.startColumn + i][move.row] == '-') {
-//                    charBoard[move.startColumn + i][move.row] = move.word.charAt(i);
-//                }
-//            } else {
-//                if (charBoard[move.row][move.startColumn + i] == '-') {
-//                    charBoard[move.row][move.startColumn + i] = move.word.charAt(i);
-//                }
-//            }
-//        }
-//    }
-
     public boolean[][] getAnchors(char[][] charBoard) {
         boolean[][] isAnchor = new boolean[15][15];
         int anchorCount = 0;
@@ -94,9 +76,4 @@ public class BoardDO {
 
         return isAnchor;
     }
-
-//    public boolean hasAdjacent(Tile tile) {
-//        return (tile.column > 0 && getCharBoard()[tile.row][tile.column-1] != '-')
-//                || (tile.column < 14 && getCharBoard()[tile.row][tile.column+1] != '-') ;
-//    }
 }

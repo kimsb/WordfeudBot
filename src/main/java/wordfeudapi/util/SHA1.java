@@ -1,4 +1,4 @@
-package util;
+package wordfeudapi.util;
 
 /**
  * @author Pierre Ingmansson

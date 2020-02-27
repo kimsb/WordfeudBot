@@ -1,6 +1,6 @@
 package wordfeudapi.domain;
 
-import static util.DateUtil.format;
+import static wordfeudapi.util.DateUtil.format;
 
 /**
  * @author Pierre Ingmansson
