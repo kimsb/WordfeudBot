@@ -1,9 +1,18 @@
 package wordfeudapi;
 
-import wordfeudapi.domain.*;
-
 import java.io.File;
 import java.io.IOException;
+import wordfeudapi.domain.ApiBoard;
+import wordfeudapi.domain.ApiTile;
+import wordfeudapi.domain.BoardType;
+import wordfeudapi.domain.Game;
+import wordfeudapi.domain.Notifications;
+import wordfeudapi.domain.PlaceResult;
+import wordfeudapi.domain.RuleSet;
+import wordfeudapi.domain.Status;
+import wordfeudapi.domain.SwapResult;
+import wordfeudapi.domain.TileMove;
+import wordfeudapi.domain.User;
 
 /**
  * @author Pierre Ingmansson
@@ -25,15 +34,15 @@ public interface WordFeudClient {
 
     Game getGame(long gameId);
 
-    Board getBoard(Game game);
+    ApiBoard getBoard(Game game);
 
-    Board getBoard(int boardId);
+    ApiBoard getBoard(int boardId);
 
     Status getStatus();
 
     PlaceResult makeMove(Game game, TileMove tileMove);
 
-    PlaceResult place(long gameId, RuleSet ruleset, Tile[] tiles, char[] word);
+    PlaceResult place(long gameId, RuleSet ruleset, ApiTile[] apiTiles, char[] word);
 
     String pass(Game game);
 

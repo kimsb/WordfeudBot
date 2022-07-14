@@ -1,11 +1,10 @@
 package wordfeudapi.domain;
 
-import com.google.gson.Gson;
+import static wordfeudapi.util.DateUtil.format;
 
+import com.google.gson.Gson;
 import java.util.Arrays;
 import java.util.Locale;
-
-import static util.DateUtil.format;
 
 /**
  * @author Pierre Ingmansson
@@ -66,12 +65,12 @@ public class Game {
         this.updated = updated;
     }
 
-    public Tile[] getTiles() {
-        final Tile[] tiles = new Tile[this.tiles.length];
+    public ApiTile[] getTiles() {
+        final ApiTile[] apiTiles = new ApiTile[this.tiles.length];
         for (int i = 0, tiles1Length = this.tiles.length; i < tiles1Length; i++) {
-            tiles[i] = new Tile(this.tiles[i]);
+            apiTiles[i] = new ApiTile(this.tiles[i]);
         }
-        return tiles;
+        return apiTiles;
     }
 
     public boolean isRunning() {
@@ -124,8 +123,8 @@ public class Game {
         throw new IllegalStateException("Opponent player not found in game!");
     }
 
-    public Rack getMyRack() {
-        return new Rack(getMe().getRack());
+    public ApiRack getMyRack() {
+        return new ApiRack(getMe().getRack());
     }
 
     public PlayerInGame[] getPlayers() {

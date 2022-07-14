@@ -1,21 +1,30 @@
 package wordfeudapi;
 
-import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-import sun.misc.BASE64Encoder;
-import util.SHA1;
-import wordfeudapi.domain.*;
-import wordfeudapi.exception.WordFeudException;
-import wordfeudapi.exception.WordFeudLoginRequiredException;
-import wordfeudapi.http.ApacheHttpClientCommunicator;
-import wordfeudapi.http.HttpCommunicator;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.HashMap;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import wordfeudapi.domain.ApiBoard;
+import wordfeudapi.domain.ApiTile;
+import wordfeudapi.domain.BoardType;
+import wordfeudapi.domain.Game;
+import wordfeudapi.domain.Notifications;
+import wordfeudapi.domain.PlaceResult;
+import wordfeudapi.domain.RuleSet;
+import wordfeudapi.domain.Status;
+import wordfeudapi.domain.SwapResult;
+import wordfeudapi.domain.TileMove;
+import wordfeudapi.domain.User;
+import wordfeudapi.exception.WordFeudException;
+import wordfeudapi.exception.WordFeudLoginRequiredException;
+import wordfeudapi.http.ApacheHttpClientCommunicator;
+import wordfeudapi.http.HttpCommunicator;
+import wordfeudapi.util.SHA1;
 
 /**
  * @author Pierre Ingmansson
@@ -41,11 +50,11 @@ public class RestWordFeudClient implements WordFeudClient {
     }
 
     @Override
-    public User logon(final String email, final String password) {
-        final String path = "/user/login/email/";
+    public User logon(final String username, final String password) {
+        final String path = "/user/login/";
 
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("email", email);
+        parameters.put("username", username);
         parameters.put("password", encodePassword(password));
 
         final JSONObject json = callAPI(path, toJSON(parameters));
@@ -166,7 +175,7 @@ public class RestWordFeudClient implements WordFeudClient {
      * @return The board
      */
     @Override
-    public Board getBoard(final Game game) {
+    public ApiBoard getBoard(final Game game) {
         return getBoard(game.getBoard());
     }
 
@@ -178,12 +187,12 @@ public class RestWordFeudClient implements WordFeudClient {
      * @return The WordFeud API response
      */
     @Override
-    public Board getBoard(final int boardId) {
+    public ApiBoard getBoard(final int boardId) {
         final String path = "/board/" + boardId + "/";
 
         final JSONObject json = callAPI(path);
         try {
-            return Board.fromJson(json.getString("content"));
+            return ApiBoard.fromJson(json.getString("content"));
         } catch (JSONException e) {
             throw new RuntimeException("Could not deserialize JSON", e);
         }
@@ -217,7 +226,7 @@ public class RestWordFeudClient implements WordFeudClient {
      */
     @Override
     public PlaceResult makeMove(final Game game, final TileMove tileMove) {
-        return place(game.getId(), game.getRuleset(), tileMove.getTiles(), tileMove.getWord().toCharArray());
+        return place(game.getId(), game.getRuleset(), tileMove.getApiTiles(), tileMove.getWord().toCharArray());
     }
 
     /**
@@ -227,18 +236,18 @@ public class RestWordFeudClient implements WordFeudClient {
      *            The ID of the game to place the word on
      * @param ruleset
      *            The ruleset the game is using
-     * @param tiles
+     * @param apiTiles
      *            The tiles to place (only the tiles to be placed = tiles from the users rack)
      * @param word
      *            The whole word to place (including tiles already on the board)
      * @return The placement result
      */
     @Override
-    public PlaceResult place(final long gameId, final RuleSet ruleset, final Tile[] tiles, final char[] word) {
+    public PlaceResult place(final long gameId, final RuleSet ruleset, final ApiTile[] apiTiles, final char[] word) {
         final String path = "/game/" + gameId + "/move/";
 
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("move", Tile.convert(tiles));
+        parameters.put("move", ApiTile.convert(apiTiles));
         parameters.put("ruleset", ruleset.getApiIntRepresentation());
         parameters.put("word", word);
 
@@ -398,7 +407,7 @@ public class RestWordFeudClient implements WordFeudClient {
         final String path = "/user/avatar/upload/";
 
         final HashMap<String, String> parameters = new HashMap<String, String>();
-        parameters.put("image_data", new BASE64Encoder().encode(imageData));
+        parameters.put("image_data", Base64.getEncoder().encodeToString(imageData));
 
         return callAPI(path, toJSON(parameters)).toString();
     }

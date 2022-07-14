@@ -26,9 +26,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
-
+import java.util.Stack;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 
 /**
@@ -102,7 +106,7 @@ public class MDAG
     /**
      * Creates an mdag from a newline delimited file containing the data of interest.
      
-     * @param dataFile          a {@link java.io.File} representation of a file
+     * @param dataFile          a {@link File} representation of a file
      *                          containing the Strings that the mdag will contain
      * @throws IOException      if {@code datafile} cannot be opened, or a read operation on it cannot be carried out
      */
@@ -111,13 +115,13 @@ public class MDAG
         BufferedReader dataFileBufferedReader = new BufferedReader(new FileReader(dataFile));
         String currentString = "";
         String previousString = "";
-        
+
         //Read all the lines in dataFile and add the String contained in each to the mdag.
         while((currentString = dataFileBufferedReader.readLine()) != null)
         {
             int mpsIndex = calculateMinimizationProcessingStartIndex(previousString, currentString);
-            
-            //If the transition path of the previousString needs to be examined for minimization or 
+
+            //If the transition path of the previousString needs to be examined for minimization or
             //equivalence class representation after a certain point, call replaceOrRegister to do so.
             if(mpsIndex != -1)
             {
@@ -127,8 +131,8 @@ public class MDAG
             }
             /////
 
-            addStringInternal(currentString); 
-            previousString = currentString;  
+            addStringInternal(currentString);
+            previousString = currentString;
         }
         /////
 
@@ -137,25 +141,25 @@ public class MDAG
         //statement to minimize the absolute last String.
         replaceOrRegister(sourceNode, previousString);
     }
-    
-    
-    
+
+
+
      /**
      * Creates an mdag from a collection of Strings.
-     
-     * @param strCollection     a {@link java.util.Collection} containing Strings that the mdag will contain
+
+     * @param strCollection     a {@link Collection} containing Strings that the mdag will contain
      */
     public MDAG(Collection<String> strCollection)
     {
         addStrings(strCollection);
     }
-    
-    
-    
+
+
+
     /**
      * Adds a Collection of Strings to the mdag.
-     
-     * @param strCollection     a {@link java.util.Collection} containing Strings to be added to the mdag
+
+     * @param strCollection     a {@link Collection} containing Strings to be added to the mdag
      */
     public final void addStrings(Collection<String> strCollection)
     {

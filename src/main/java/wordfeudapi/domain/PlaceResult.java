@@ -1,11 +1,10 @@
 package wordfeudapi.domain;
 
+import static wordfeudapi.util.DateUtil.format;
+
 import com.google.gson.Gson;
-import util.ArrayUtil;
-
 import java.util.Arrays;
-
-import static util.DateUtil.format;
+import wordfeudapi.util.ArrayUtil;
 
 /**
  * @author Pierre Ingmansson

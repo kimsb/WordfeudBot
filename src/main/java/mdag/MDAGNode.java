@@ -22,11 +22,9 @@
 
 package mdag;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
 import java.util.TreeMap;
-
 
 
 /**
@@ -100,46 +98,46 @@ public class MDAGNode
         isAcceptNode = node.isAcceptNode;
         outgoingTransitionTreeMap = new TreeMap<Character, MDAGNode>(node.outgoingTransitionTreeMap);
         
-        for(Map.Entry<Character, MDAGNode> transitionKeyValuePair : outgoingTransitionTreeMap.entrySet())
+        for(Entry<Character, MDAGNode> transitionKeyValuePair : outgoingTransitionTreeMap.entrySet())
             transitionKeyValuePair.getValue().incomingTransitionCount++;
     }
-    
-    
-    
+
+
+
     /**
      * Creates an MDAGNode possessing the same accept state status and outgoing transitions as this node.
-     
+
      * @return      an MDAGNode possessing the same accept state status and outgoing transitions as this node
      */
     public MDAGNode clone()
     {
         return new MDAGNode(this);
     }
-    
-    
-    
+
+
+
     /**
-     * Creates an MDAGNode possessing the same accept state status ant transition set 
+     * Creates an MDAGNode possessing the same accept state status ant transition set
      * (incoming & outgoing) as this node. outgoing transitions as this node.
-     
+
      * @param soleParentNode                        the MDAGNode possessing the only transition that targets this node
      * @param parentToCloneTransitionLabelChar      the char which labels the transition from {@code soleParentNode} to this node
-     * @return                                      an MDAGNode possessing the same accept state status and transition set as this node. 
+     * @return                                      an MDAGNode possessing the same accept state status and transition set as this node.
      */
     public MDAGNode clone(MDAGNode soleParentNode, char parentToCloneTransitionLabelChar)
     {
         MDAGNode cloneNode = new MDAGNode(this);
         soleParentNode.reassignOutgoingTransition(parentToCloneTransitionLabelChar, this, cloneNode);
-        
+
         return cloneNode;
     }
-    
-    
+
+
 
     /**
      * Retrieves the index in a simplified mdag data array that the SimpleMDAGNode
      * representation of this node's outgoing transition set begins at.
-     
+
      * @return      the index in a simplified mdag data array that this node's transition set begins at,
      *              or -1 if its transition set is not present in such an array
      */
@@ -147,9 +145,9 @@ public class MDAGNode
     {
         return transitionSetBeginIndex;
     }
-    
-    
-     public Map.Entry<Character, MDAGNode> getLastTransition()
+
+
+     public Entry<Character, MDAGNode> getLastTransition()
     {
         return outgoingTransitionTreeMap.lastEntry();
     }
@@ -239,7 +237,7 @@ public class MDAGNode
      */
     public boolean hasOutgoingTransition(char letter)
     {
-        return outgoingTransitionTreeMap.containsKey(letter);
+        return outgoingTransitionTreeMap.containsKey(Character.toUpperCase(letter));
     }
     
     
@@ -265,7 +263,7 @@ public class MDAGNode
      */
     public MDAGNode transition(char letter)
     {
-        return outgoingTransitionTreeMap.get(letter);
+        return outgoingTransitionTreeMap.get(Character.toUpperCase(letter));
     }
     
     
@@ -279,6 +277,7 @@ public class MDAGNode
      */
     public MDAGNode transition(String str)
     {
+        str = str.toUpperCase();
         int charCount = str.length();
         MDAGNode currentNode = this;
         
@@ -408,17 +407,6 @@ public class MDAGNode
     }
 
 
-    
-    /**
-     * Determines whether the sets of transition paths from two MDAGNodes are equivalent. This is an expensive operation.
-     
-     * @param outgoingTransitionTreeMap1        a TreeMap containing entries collectively representing
-     *                                          all of a node's outgoing transitions
-     * @param outgoingTransitionTreeMap2        a TreeMap containing entries collectively representing
-     *                                          all of a node's outgoing transitions
-     * @return                                  true if the set of transition paths from {@code node1}
-     *                                          and {@code node2} are equivalent
-     */
     public static boolean haveSameTransitions(MDAGNode node1, MDAGNode node2)
     {
         TreeMap<Character, MDAGNode> outgoingTransitionTreeMap1 = node1.outgoingTransitionTreeMap;
