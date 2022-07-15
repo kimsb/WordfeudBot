@@ -12,6 +12,7 @@ object Main {
     WFApi(bot = myBot)
 
     //Scrabble game
+    Constants.platform = "SCRABBLE"
     Scrabble(bot = myBot).play()
 
     //Simulation
