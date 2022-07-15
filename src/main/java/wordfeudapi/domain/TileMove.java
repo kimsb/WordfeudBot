@@ -32,6 +32,12 @@ public class TileMove implements Comparable<TileMove> {
         return horizontalWord;
     }
 
+    public String chatMovePosition() {
+        int x = "ABCDEFGHIJKLMNO".charAt(apiTiles[0].getX());
+        String arrow = isHorizontalWord() ? "\u21E2" : "\u21E3";
+        return "(" + x + (apiTiles[0].getY() + 1) + arrow + ")";
+    }
+
     @Override
     public int compareTo(TileMove other) {
         return other.getPoints() - getPoints();

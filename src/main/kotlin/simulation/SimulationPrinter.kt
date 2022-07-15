@@ -49,7 +49,7 @@ fun printSimulatedRounds(myBot: Bot, controlBot: Bot, simulatedRounds: List<Simu
     )
 }
 
-private fun Board.toPrintableLines(): List<String> {
+fun Board.toPrintableLines(): List<String> {
     val boardLines = squares.map { row ->
         "| " + row.map { square ->
             when {

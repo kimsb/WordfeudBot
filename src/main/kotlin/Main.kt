@@ -1,20 +1,25 @@
+import scrabble.Scrabble
 import simulation.Simulator
 
 object Main {
-    @JvmStatic
-    fun main(args: Array<String>) {
 
-        val myBot = MyBot(System.getenv("WF_BOTNAME"))
+  @JvmStatic
+  fun main(args: Array<String>) {
 
-        //The real deal
-        WFApi(bot = myBot)
+    val myBot = MyBot(System.getenv("WF_BOTNAME"))
 
-        //Simulation
-        Simulator(
-            bot = myBot,
-            controlBot = ControlBot()
-        ).simulate(
-            rounds = 100
-        )
-    }
+    //The real deal
+    WFApi(bot = myBot)
+
+    //Scrabble game
+    Scrabble(bot = myBot).play()
+
+    //Simulation
+    Simulator(
+      bot = myBot,
+      controlBot = ControlBot()
+    ).simulate(
+      rounds = 100
+    )
+  }
 }

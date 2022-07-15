@@ -4,7 +4,8 @@ object Constants {
     const val letterDistribution =
         "AAAAAAABBBCDDDDDEEEEEEEEEFFFFGGGGHHHIIIIIIJJKKKKLLLLLMMMNNNNNNOOOOPPRRRRRRRSSSSSSSTTTTTTTUUUVVVWYÆØØÅÅ**"
 
-    private val letterScores =
+
+    private val letterScoresWF =
         mapOf(
             Pair('A', 1),
             Pair('B', 4),
@@ -34,6 +35,6 @@ object Constants {
             Pair('Å', 4))
 
     fun letterScore(letter: Char): Int {
-        return letterScores.getOrElse(letter) { 0 }
+        return letterScoresWF.getOrElse(letter) { 0 }
     }
 }

@@ -2,10 +2,7 @@ package simulation
 
 import Bot
 import Constants
-import domain.Board
-import domain.Game
-import domain.Rack
-import domain.Turn
+import domain.*
 import domain.TurnType.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -49,7 +46,7 @@ class Simulator(
     private fun simulateGame(bag: Bag, myBotStarts: Boolean): SimulatedGame {
         var player1 = Player(bot = if (myBotStarts) bot else controlBot, rack = Rack(bag.pickTiles(7)))
         var player2 = Player(bot = if (myBotStarts) controlBot else bot, rack = Rack(bag.pickTiles(7)))
-        var board = emptyBoard()
+        var board = emptyWFBoard()
         var scorelessTurns = 0
         var player1sTurn = true
         var gameIsRunning = true
@@ -117,25 +114,6 @@ class Simulator(
         )
     }
 
-    data class Bag(
-        var tiles: List<Char>
-    ) {
-        fun pickTiles(count: Int): List<Char> {
-            val removed = tiles.subList(0, minOf(tiles.size, count))
-            tiles = tiles.drop(removed.size)
-            return removed
-        }
-
-        fun swapTiles(toSwap: List<Char>): List<Char> {
-            check(tiles.size >= 7) { "Trying to swap when bag only contains ${tiles.size} letters" }
-            val removed = tiles.subList(0, toSwap.size)
-            tiles = tiles.drop(toSwap.size)
-            tiles = tiles + toSwap
-            tiles = tiles.shuffled()
-            return removed
-        }
-    }
-
     data class Player(
         val bot: Bot,
         var rack: Rack,
@@ -157,7 +135,7 @@ class Simulator(
         val controlBotScore: Int
     )
 
-    private fun emptyBoard(): Board {
+    private fun emptyWFBoard(): Board {
         val standardApiBoard = ApiBoard(
             arrayOf(
                 intArrayOf(2, 0, 0, 0, 4, 0, 0, 1, 0, 0, 4, 0, 0, 0, 2),

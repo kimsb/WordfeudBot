@@ -101,7 +101,7 @@ class WFApi(
 
       val message = highestScoringTips(allMovesSorted) +
           bingoTips(allMovesSorted) +
-          swapTips(allMovesSorted, moominGame)
+          swapTips(moominGame)
 
       println("message: $message")
 
@@ -112,7 +112,7 @@ class WFApi(
   private fun highestScoringTips(allMovesSorted: List<Move>): String {
     val highestScoringWord = allMovesSorted.first()
     return "Høyest scorende legg:\n" +
-        "${highestScoringWord.score}: ${highestScoringWord.word} ${chatMovePosition(highestScoringWord.toTileMove())}"
+        "${highestScoringWord.score}: ${highestScoringWord.word} ${highestScoringWord.toTileMove().chatMovePosition()}"
   }
 
   private fun bingoTips(allMovesSorted: List<Move>): String {
@@ -121,13 +121,13 @@ class WFApi(
       if (bingos.isNotEmpty()) {
         val bingo = bingos.first()
         return "\nDu kan legge bingo:\n" +
-            "${bingo.score}: ${bingo.word} ${chatMovePosition(bingo.toTileMove())}"
+            "${bingo.score}: ${bingo.word} ${bingo.toTileMove().chatMovePosition()}"
       }
     }
     return ""
   }
 
-  private fun swapTips(allMovesSorted: List<Move>, game: Game): String {
+  private fun swapTips(game: Game): String {
     val rack = String(game.myRack.chars())
     if (game.bagCount >= 7) {
       val usedTiles = game.tiles.map { it.character }
@@ -139,12 +139,5 @@ class WFApi(
     }
     return ""
   }
-
-  private fun chatMovePosition(tileMove: TileMove): String {
-    val x = "ABCDEFGHIJKLMNO"[tileMove.apiTiles[0].x]
-    val arrow = if (tileMove.isHorizontalWord) "\u21E2" else "\u21E3"
-    return "(" + x + (tileMove.apiTiles[0].y + 1).toString() + arrow + ")"
-  }
-
 
 }
