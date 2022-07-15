@@ -5,12 +5,14 @@ import mdag.MDAGNode
 const val startBag =
   "AAAAAAABBBCDDDDDEEEEEEEEEFFFFGGGGHHHIIIIIIJJKKKKLLLLLMMMNNNNNNOOOOPPRRRRRRRSSSSSSSTTTTTTTUUUVVVWYÆØØÅÅ"
 var startBagMap: Map<Char, Int> = emptyMap()
+var startBagSize = startBag.length
 
 private fun initStartBagMap(usedTiles: List<Char>) {
   var bag = startBag
   usedTiles.forEach { bag = bag.replaceFirst(it, '-') }
   bag = bag.replace("-", "")
   startBagMap = bag.groupingBy { it }.eachCount()
+  startBagSize = bag.length
 }
 
 fun allSwapsSorted(rack: String, usedTiles: List<Char>): List<Pair<String, Double>> {
@@ -33,7 +35,7 @@ fun swap1(leave: String, leaveIndex: Int, trukket: String, bag: MutableMap<Char,
       trukket.mapIndexed { index, char ->
         val count = tempMap[char]!!
         tempMap[char] = count - 1
-        count / (startBag.length.toDouble() - index)
+        count / (startBagSize.toDouble() - index)
       }.reduce { acc, i -> acc * i } * getPermutationCount(trukket)
   }
 

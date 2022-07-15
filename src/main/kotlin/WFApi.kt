@@ -70,7 +70,7 @@ class WFApi(
         println("Playing ${tileMove.word} for ${tileMove.points} points")
         wfClient.makeMove(game, tileMove)
       }
-      SWAP -> { //TODO finne ut hvordan swappe blank
+      SWAP -> { //TODO finne ut hvordan swappe blank / bruke bestSwap-logikk
         val toSwap = turn.tilesToSwap.filter { it != '*' }
         println("Swapping [${toSwap.joinToString("")}]")
         wfClient.swap(game, toSwap.toCharArray())
