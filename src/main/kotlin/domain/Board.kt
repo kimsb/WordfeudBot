@@ -23,7 +23,7 @@ class Board(squares: List<List<Square>>) {
         apiBoard.board.mapIndexed { row, ints ->
             ints.mapIndexed { column, _ ->
                 val tile = apiTiles.find { it.x == column && it.y == row }
-                    ?.let { Tile(if (it.isWildcard) it.character.toLowerCase() else it.character) }
+                    ?.let { Tile(if (it.isWildcard) it.character.lowercaseChar() else it.character) }
                 Square(
                     tile = tile,
                     letterMultiplier = apiBoard.getLetterMultiplier(column, row),

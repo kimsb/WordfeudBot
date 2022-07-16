@@ -8,12 +8,14 @@ object Main {
 
     val myBot = MyBot(System.getenv("WF_BOTNAME"))
 
+    //Scrabble game
+    if (args.isNotEmpty() && args[0] == "SCRABBLE") {
+      Constants.platform = "SCRABBLE"
+      Scrabble(bot = myBot).play()
+    }
+
     //The real deal
     WFApi(bot = myBot)
-
-    //Scrabble game
-    Constants.platform = "SCRABBLE"
-    Scrabble(bot = myBot).play()
 
     //Simulation
     Simulator(

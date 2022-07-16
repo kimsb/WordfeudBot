@@ -78,35 +78,37 @@ class Scrabble(val bot: Bot) {
 
       when {
         input == "PASS" -> {
-          playerTurns.add(PlayerTurn(board, allMovesSorted, allSwapsSorted, Turn(PASS)))
+          playerTurns.add(PlayerTurn(playerRack, board, allMovesSorted, allSwapsSorted, Turn(PASS)))
         }
         input.startsWith("BYTT") -> {
           val toSwap = input.substring(5).toList()
           val pickedUp = bag.swapTiles(toSwap)
           println("du plukket opp: ${pickedUp.joinToString("")}")
           playerRack = playerRack.swap(toSwap = toSwap, newLetters = pickedUp)
-          playerTurns.add(PlayerTurn(board, allMovesSorted, allSwapsSorted, Turn(SWAP, tilesToSwap = toSwap)))
+          playerTurns.add(PlayerTurn(playerRack, board, allMovesSorted, allSwapsSorted, Turn(SWAP, tilesToSwap = toSwap)))
         }
         else -> {
-          val inputRow = if (input.contains(">")) input.substring(1, input.indexOf(">")).toInt()
-          else input.substring(1, input.indexOf(" ")).toInt()
+          val (row, column, isHorizontal) = decodeInputCoordinate(input)
+          val word = input.substringAfter(" ")
           val move = allMovesSorted.find {
-            it.word == input.substringAfter(" ")
-                && it.horizontal == input.contains(">")
-                && it.row == inputRow
-                && it.addedTiles.first().second.column == "ABCDEFGHIJKLMNO".indexOf(input.first())
+            it.word == word
+                && it.horizontal == isHorizontal
+                && it.row == row
+                && if (isHorizontal) it.addedTiles.first().second.column == column else it.addedTiles.first().second.row == column
           }
           if (move == null) {
             println("Buuuuh! Du har gjort et ugyldig trekk...")
-            playerTurns.add(PlayerTurn(board, allMovesSorted, allSwapsSorted, Turn(PASS)))
+            playerTurns.add(PlayerTurn(playerRack, board, allMovesSorted, allSwapsSorted, Turn(PASS), failedAttempt = "Du prøvde å legge $input"))
           } else {
             println("Du la ${move.word} for ${move.score} poeng")
             playerScore += move.score
-            playerTurns.add(PlayerTurn(board, allMovesSorted, allSwapsSorted, Turn(MOVE, move = move)))
+            playerTurns.add(PlayerTurn(playerRack, board, allMovesSorted, allSwapsSorted, Turn(MOVE, move = move)))
             board = board.withMove(move)
+            val newLetters = bag.pickTiles(move.addedTiles.size)
+            println("Du trakk ${String(newLetters.toCharArray())}")
             playerRack = playerRack.swap(
               toSwap = move.addedTiles.map { it.first.letter },
-              newLetters = bag.pickTiles(move.addedTiles.size)
+              newLetters = newLetters
             )
             if (playerRack.tiles.isEmpty()) {
               println("Kampen er ferdig!")
@@ -116,40 +118,53 @@ class Scrabble(val bot: Bot) {
         }
       }
     }
+    analyze(playerTurns)
+    println("La oss spille en kamp til!")
+    play()
+  }
+}
 
-    println("Tid for refleksjon!")
-    playerTurns.forEachIndexed { index, playerTurn ->
-      print("Trekk #$index:")
-      val turn = playerTurn.turn
-      when (playerTurn.turn.turnType) {
-        MOVE -> println("Du la ${turn.move!!.word} for ${turn.move.score} poeng")
-        SWAP -> println("Du byttet ${String(turn.tilesToSwap.toCharArray())}")
-        PASS -> println("Du passet")
+private fun analyze(playerTurns: MutableList<PlayerTurn>) {
+  println("Tid for refleksjon!")
+  playerTurns.forEachIndexed { index, playerTurn ->
+    println("Trekk #${index + 1}: ")
+    println("Rack: ${String(playerTurn.rack.tiles.toCharArray())}")
+    println()
+    println("+---------------------------------------------+")
+    playerTurn.board.toPrintableLines().forEach { println(it) }
+    println()
+    val turn = playerTurn.turn
+    when (playerTurn.turn.turnType) {
+      MOVE -> println("Du la ${turn.move!!.word} for ${turn.move.score} poeng")
+      SWAP -> println("Du byttet ${String(turn.tilesToSwap.toCharArray())}")
+      PASS -> {
+        if (playerTurn.failedAttempt == null) println("Du passet")
+        else println(playerTurn.failedAttempt)
       }
-      if (playerTurn.allMovesSorted.isEmpty()) {
-        println("Du kunne ikke lagt et gyldig legg")
-      } else {
-        println("De høyest scorende leggene du kunne gjort:")
-        playerTurn.allMovesSorted.subList(0, playerTurn.allMovesSorted.size.coerceAtMost(10)).forEach {
-          println("${it.score}: ${it.word} ${it.toTileMove().chatMovePosition()} ")
-        }
-        println()
+    }
+    if (playerTurn.allMovesSorted.isEmpty()) {
+      println("Du kunne ikke lagt et gyldig legg")
+    } else {
+      println("De høyest scorende leggene du kunne gjort:")
+      playerTurn.allMovesSorted.subList(0, playerTurn.allMovesSorted.size.coerceAtMost(10)).forEach {
+        println("${it.score}: ${it.word} ${it.toTileMove().chatMovePosition()} ")
       }
-
-      if (playerTurn.allSwapsSorted.isEmpty()) {
-        println("Du kunnet ikke byttet")
-      } else {
-        println("De beste byttene du kunne gjort:")
-        playerTurn.allSwapsSorted.subList(0, playerTurn.allSwapsSorted.size.coerceAtMost(10)).forEach {
-          println("${it.first}: ${String.format("%.2f%%", it.second * 100)} ")
-        }
-        println()
-      }
-
-      println("La oss spille en kamp til!")
-      play()
+      println()
     }
 
+    if (playerTurn.allSwapsSorted.isEmpty()) {
+      println("Du kunnet ikke byttet")
+    } else if (playerTurn.allSwapsSorted.first().second == 1.0) {
+      println("Du hadde bingo på hånda!")
+    } else {
+      println("De beste byttene du kunne gjort:")
+      playerTurn.allSwapsSorted.subList(0, playerTurn.allSwapsSorted.size.coerceAtMost(10)).forEach {
+        println("${it.first}: ${String.format("%.2f%%", it.second * 100)} ")
+      }
+      println()
+    }
+    println("Trykk på en knapp for å se neste legg")
+    readLine()
   }
 }
 
@@ -159,14 +174,26 @@ private fun inputIsValid(input: String): Boolean {
   return true
 }
 
+private fun decodeInputCoordinate(input: String): Triple<Int, Int, Boolean> {
+  val isHorizontal = input.contains(">")
+  val endIndex = if (isHorizontal) input.indexOf(">") else input.indexOf(" ")
+  val inputColumn = "ABCDEFGHIJKLMNO".indexOf(input[endIndex - 1])
+  val inputRow = input.substring(0, endIndex - 1).toInt() - 1
+  val row = if (isHorizontal) inputRow else inputColumn
+  val column = if (isHorizontal) inputColumn else inputRow
+  return Triple(row, column, isHorizontal)
+}
+
 data class PlayerTurn(
+  val rack: Rack,
   val board: Board,
   val allMovesSorted: List<Move>,
   val allSwapsSorted: List<Pair<String, Double>>,
-  val turn: Turn
+  val turn: Turn,
+  val failedAttempt: String? = null //TODO dette burde nok være en turnType
 )
 
-private fun emptyScrabbleBoard(): Board {
+fun emptyScrabbleBoard(): Board {
   val standardApiBoard = ApiBoard(
     arrayOf(
       intArrayOf(4, 0, 0, 1, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 4),
