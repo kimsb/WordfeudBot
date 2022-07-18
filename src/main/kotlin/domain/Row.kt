@@ -2,6 +2,7 @@ package domain
 
 import Constants
 import Constants.VALID_LETTERS
+import Constants.bingoScore
 import Constants.letterScore
 import Dictionary.contains
 import Dictionary.getSourceNode
@@ -85,7 +86,7 @@ data class Row(
                 }
                 squareScore
             }
-        }.sum() * wordMultiplier + crossSums + (if (addedLetters == 7) 40 else 0)
+        }.sum() * wordMultiplier + crossSums + (if (addedLetters == 7) bingoScore() else 0)
     }
 
     private fun leftPart(

@@ -11,7 +11,7 @@ data class Rack(
     }
 
     fun without(letter: Char): Rack {
-        val index = tiles.indexOf(letter)
+        val index = tiles.indexOf(if (letter.isLowerCase()) '*' else letter)
         return Rack(tiles.subList(0, index) + tiles.subList(index + 1, tiles.size))
     }
 

@@ -1,8 +1,11 @@
 object Constants {
 
   const val VALID_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ"
-  const val letterDistribution =
+  const val letterDistributionWF =
     "AAAAAAABBBCDDDDDEEEEEEEEEFFFFGGGGHHHIIIIIIJJKKKKLLLLLMMMNNNNNNOOOOPPRRRRRRRSSSSSSSTTTTTTTUUUVVVWYÆØØÅÅ**"
+
+  const val letterDistributionScrabble =
+    "AAAAAAABBBCDDDDDEEEEEEEEEFFFFGGGGHHHIIIIIJJKKKKLLLLLMMMNNNNNNOOOOPPRRRRRRSSSSSSTTTTTTUUUVVVWYÆØØÅÅ**"
 
   private val letterScoresWF =
     mapOf(
@@ -69,5 +72,10 @@ object Constants {
   fun letterScore(letter: Char): Int {
     return if (platform == "WF") letterScoresWF.getOrElse(letter) { 0 }
     else letterScoresScrabble.getOrElse(letter) { 0 }
+  }
+
+  fun bingoScore(): Int {
+    return if (platform == "WF") 40
+    else 50
   }
 }

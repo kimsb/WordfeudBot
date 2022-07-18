@@ -35,7 +35,7 @@ public class TileMove implements Comparable<TileMove> {
     public String chatMovePosition() {
         char x = "ABCDEFGHIJKLMNO".charAt(apiTiles[0].getX());
         String arrow = isHorizontalWord() ? "\u21E2" : "\u21E3";
-        return "(" + x + (apiTiles[0].getY() + 1) + arrow + ")";
+        return "(" + (apiTiles[0].getY() + 1) + x + arrow + ")";
     }
 
     @Override

@@ -107,16 +107,6 @@ class Board(squares: List<List<Square>>) {
         return Board(mutableSquares)
     }
 
-    fun lettersInBagOrOpponentsRack(myRack: Rack): String {
-        val allLetters = StringBuilder(Constants.letterDistribution)
-        val lettersOnBoard = squares.flatten().filter { it.isOccupied() }.map { it.getLetter()!! }
-        (myRack.tiles + lettersOnBoard).forEach {
-        val letter = if (it.isLowerCase()) '*' else it
-            allLetters.deleteCharAt(allLetters.indexOf(letter))
-        }
-        return allLetters.toString()
-    }
-
     fun bagCount(): Int {
         val occupiedSquares = squares.flatten().filter { it.isOccupied() }.count()
         return max(0, 90 - occupiedSquares)

@@ -34,7 +34,7 @@ class Simulator(
     }
 
     private fun simulateRound(): SimulatedRound {
-        val letters = letterDistribution?.toList() ?: Constants.letterDistribution.toList().shuffled()
+        val letters = letterDistribution?.toList() ?: Constants.letterDistributionWF.toList().shuffled()
 
         return SimulatedRound(
             initialLetterDistribution = letters.joinToString(""),

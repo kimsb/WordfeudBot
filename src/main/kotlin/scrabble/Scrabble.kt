@@ -1,6 +1,7 @@
 package scrabble
 
 import Bot
+import Constants
 import allSwapsSorted
 import domain.*
 import domain.TurnType.*
@@ -11,7 +12,7 @@ import kotlin.random.Random
 //TODO scrabble-scores på letters
 class Scrabble(val bot: Bot) {
 
-  private val bag = Bag(Constants.letterDistribution.toList().shuffled())
+  private var bag = Bag(Constants.letterDistributionScrabble.toList().shuffled())
 
   fun play() {
     val firstPlayerRack = bag.pickTiles(7)
@@ -23,9 +24,25 @@ class Scrabble(val bot: Bot) {
     var botScore = 0
     var board = emptyScrabbleBoard()
     val gameIsRunning = true
-    val playerTurns: MutableList<PlayerTurn> = mutableListOf()
+    var playerTurns: MutableList<PlayerTurn> = mutableListOf()
+    var botTurns: MutableList<Turn> = mutableListOf()
+
+    val gameStates: MutableList<GameState> = mutableListOf()
 
     while (gameIsRunning) {
+
+      gameStates.add(
+        GameState(
+          Rack(playerRack.tiles),
+          Rack(botRack.tiles),
+          playerScore,
+          botScore,
+          board,
+          Bag(bag.tiles),
+          playerTurns.toMutableList(),
+          botTurns.toMutableList()
+        )
+      )
 
       if (playerTurns.isNotEmpty() || playerStarts.not()) {
         val game = Game(
@@ -36,6 +53,7 @@ class Scrabble(val bot: Bot) {
           scorelessTurns = 0 //TODO ta med dette her?
         )
         val botTurn = bot.makeTurn(game)
+        botTurns.add(botTurn)
         when (botTurn.turnType) {
           MOVE -> {
             botScore += botTurn.move!!.score
@@ -71,12 +89,26 @@ class Scrabble(val bot: Bot) {
       val allSwapsSorted = allSwapsSorted(String(playerRack.tiles.toCharArray()), tilesOnBoard)
       var input = ""
 
-      while (!inputIsValid(input)) {
+      while (!inputIsValid(input, playerRack)) {
         print("Trekk: ")
         input = readLine()!!
       }
 
       when {
+        input == "-" -> {
+          println("går tilbake ett trekk...")
+          if (gameStates.size > 1) gameStates.removeLast()
+          val previousState = gameStates.last()
+          playerRack = previousState.playerRack
+          botRack = previousState.botRack
+          playerScore = previousState.playerScore
+          botScore = previousState.botScore
+          board = previousState.board
+          bag = previousState.bag
+          playerTurns = previousState.playerTurns
+          botTurns = previousState.botTurns
+          gameStates.removeLast()
+        }
         input == "PASS" -> {
           playerTurns.add(PlayerTurn(playerRack, board, allMovesSorted, allSwapsSorted, Turn(PASS)))
         }
@@ -124,19 +156,49 @@ class Scrabble(val bot: Bot) {
   }
 }
 
+private data class GameState(
+  val playerRack: Rack,
+  val botRack: Rack,
+  val playerScore: Int,
+  val botScore: Int,
+  val board: Board,
+  val bag: Bag,
+  val playerTurns: MutableList<PlayerTurn>,
+  val botTurns: MutableList<Turn>
+)
+
 private fun analyze(playerTurns: MutableList<PlayerTurn>) {
-  println("Tid for refleksjon!")
+  println("Tid for refleksjon!\n")
   playerTurns.forEachIndexed { index, playerTurn ->
+    println("     A  B  C  D  E  F  G  H  I  J  K  L  M  N  O")
+    println("   +---------------------------------------------+")
+    playerTurn.board.toPrintableLines().forEachIndexed { rowIndex, line ->
+      if (rowIndex + 1 < 10) print(" ")
+      if (rowIndex + 1 < 16) println("${rowIndex + 1} $line")
+      else println("   $line")
+    }
     println("Trekk #${index + 1}: ")
     println("Rack: ${String(playerTurn.rack.tiles.toCharArray())}")
     println()
-    println("+---------------------------------------------+")
-    playerTurn.board.toPrintableLines().forEach { println(it) }
-    println()
     val turn = playerTurn.turn
     when (playerTurn.turn.turnType) {
-      MOVE -> println("Du la ${turn.move!!.word} for ${turn.move.score} poeng")
-      SWAP -> println("Du byttet ${String(turn.tilesToSwap.toCharArray())}")
+      MOVE -> {
+        println("Du la ${turn.move!!.word} for ${turn.move.score} poeng")
+
+      }
+      SWAP -> {
+        var keptTiles = playerTurn.rack
+        turn.tilesToSwap.forEach { keptTiles = keptTiles.without(it) }
+        val keptTilesString = String(keptTiles.tiles.toCharArray().sortedArray())
+        println(
+          "Du sparte $keptTilesString, det ga ${
+            String.format(
+              "%.2f%%",
+              playerTurn.allSwapsSorted.find { it.first == keptTilesString }!!.second * 100
+            )
+          } sjanse for bingo"
+        )
+      }
       PASS -> {
         if (playerTurn.failedAttempt == null) println("Du passet")
         else println(playerTurn.failedAttempt)
@@ -145,11 +207,29 @@ private fun analyze(playerTurns: MutableList<PlayerTurn>) {
     if (playerTurn.allMovesSorted.isEmpty()) {
       println("Du kunne ikke lagt et gyldig legg")
     } else {
-      println("De høyest scorende leggene du kunne gjort:")
-      playerTurn.allMovesSorted.subList(0, playerTurn.allMovesSorted.size.coerceAtMost(10)).forEach {
-        println("${it.score}: ${it.word} ${it.toTileMove().chatMovePosition()} ")
+      if (turn.turnType == MOVE && playerTurn.allMovesSorted.first().score == turn.move!!.score) {
+        println("Nice! Du fant det høyest scorende legget!")
+      } else {
+        println("De høyest scorende leggene du kunne gjort:")
+        playerTurn.allMovesSorted.subList(0, playerTurn.allMovesSorted.size.coerceAtMost(8)).forEach {
+          println("${it.score}: ${it.word} ${it.toTileMove().chatMovePosition()} ")
+        }
       }
       println()
+    }
+
+    if (turn.turnType == MOVE) {
+      var keptTiles = playerTurn.rack
+      turn.move!!.addedTiles.forEach { keptTiles = keptTiles.without(it.first.letter) }
+      val keptTilesString = String(keptTiles.tiles.toCharArray().sortedArray())
+      println(
+        "Du satt igjen med $keptTilesString, det ga ${
+          String.format(
+            "%.2f%%",
+            playerTurn.allSwapsSorted.find { it.first == keptTilesString }!!.second * 100
+          )
+        } sjanse for bingo\n8H> WAP"
+      )
     }
 
     if (playerTurn.allSwapsSorted.isEmpty()) {
@@ -157,9 +237,15 @@ private fun analyze(playerTurns: MutableList<PlayerTurn>) {
     } else if (playerTurn.allSwapsSorted.first().second == 1.0) {
       println("Du hadde bingo på hånda!")
     } else {
-      println("De beste byttene du kunne gjort:")
-      playerTurn.allSwapsSorted.subList(0, playerTurn.allSwapsSorted.size.coerceAtMost(10)).forEach {
-        println("${it.first}: ${String.format("%.2f%%", it.second * 100)} ")
+      if (turn.turnType == SWAP) {
+        println("De beste byttene du kunne gjort:")
+        playerTurn.allSwapsSorted.subList(0, playerTurn.allSwapsSorted.size.coerceAtMost(8)).forEach {
+          println("${it.first}: ${String.format("%.2f%%", it.second * 100)} ")
+        }
+      } else {
+        println("Det beste byttet du kunne gjort:")
+        val swap = playerTurn.allSwapsSorted.first()
+        println("${swap.first}: ${String.format("%.2f%%", swap.second * 100)} ")
       }
       println()
     }
@@ -168,10 +254,35 @@ private fun analyze(playerTurns: MutableList<PlayerTurn>) {
   }
 }
 
-//TODO valider input
-private fun inputIsValid(input: String): Boolean {
-  if (input.isBlank()) return false
-  return true
+private fun inputIsValid(input: String, playerRack: Rack): Boolean {
+  when (input) {
+    "" -> return false
+    "-" -> return true
+    "PASS" -> return true
+    else -> {
+      if (input.startsWith("BYTT ")) {
+        var playerTiles = playerRack.tiles
+        val toSwap = input.substring(5)
+        toSwap.forEach {
+          if (playerTiles.contains(it)) {
+            playerTiles = playerTiles.minusElement(it)
+          } else {
+            //prøver å bytte brikker du ikke har
+            return false
+          }
+        }
+        return true
+      }
+      try {
+        val (inputRow, inputColumn, _) = decodeInputCoordinate(input)
+        if (inputRow < 0 || inputRow > 14) return false
+        if (inputColumn < 0 || inputColumn > 14) return false
+        return true
+      } catch (e: Exception) {
+        return false
+      }
+    }
+  }
 }
 
 private fun decodeInputCoordinate(input: String): Triple<Int, Int, Boolean> {
